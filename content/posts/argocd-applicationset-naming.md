@@ -4,8 +4,6 @@ draft = false
 title = 'ArgoCD ApplicationSet 자동 네이밍의 함정'
 +++
 
-> DevOps 스택 회고 시리즈 1편. (2편: ALB 수동 생성 + TargetGroupBinding 수동 연결, 3편: sync policy를 manual로 깐 이유, 종합편: 전체 아키텍처 정리 예정)
-
 앱 하나 배포할 땐 아무 문제 없었다. 근데 두 번째 앱을 GitOps 리포에 붙이자마자 ArgoCD 화면에 Application이 하나만 떠 있었다. 분명 디렉토리는 두 개를 커밋했는데. 범인은 `{{path.basename}}`이었다 — 이 변수는 스캔한 경로의 **가장 오른쪽 이름만** 돌려주는데, 우리 리포 구조가 `manifests/applications/<app>/overlays/prd`처럼 한 겹 더 들어가 있다 보니 앱이 몇 개든 전부 `"prd"`라는 이름으로 잡혀버린 거다. 결론부터 말하면, 이런 구조에선 `{{path.basename}}` 대신 `{{path[2]}}`처럼 인덱스로 원하는 세그먼트를 콕 집어야 한다.
 
 ## 증상: Application이 하나로 합쳐졌다
