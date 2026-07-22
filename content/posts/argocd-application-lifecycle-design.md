@@ -127,7 +127,7 @@ replicas 수동 변경
 2. 이 필드는 Git이 관리해야 하는가?
 3. Git이 관리해야 한다면 `selfHeal`로 복구할 것인가?
 
-## 4. App-of-Apps는 부트스트랩을 단순하게 만들고, 전파 범위를 늘린다
+## 4. App-of-Apps: 여러 Application을 하나의 시작점으로 묶는다
 
 이 구조에서 App-of-Apps는 서비스 배포 리소스를 직접 적용하는 새로운 controller가 아니다. 클러스터·플랫폼·서비스를 관리할 `Application`들을 parent 하나에서 부트스트랩하는 진입점이다.
 
