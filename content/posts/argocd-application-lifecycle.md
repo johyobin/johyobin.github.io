@@ -1,14 +1,16 @@
 +++
 date = '2026-07-22T00:00:00+09:00'
 draft = false
-title = 'Argo CD GitOps에서 애플리케이션 생명주기를 설계하는 법'
+title = 'Git에서 Argo CD가 참조하는 매니페스트 디렉터리를 삭제하면 어디까지 삭제되는가'
 +++
 
-# Argo CD GitOps에서 애플리케이션 생명주기를 설계하는 법
+# Git에서 Argo CD가 참조하는 매니페스트 디렉터리를 삭제하면 어디까지 삭제되는가
 
-운영 중인 서비스의 디렉터리 하나를 Git에서 삭제했다. 그러면 Argo CD는 Application만 정리할까, 아니면 해당 Application의 관리 대상 리소스(workload)까지 정리할까?
+운영 중인 서비스의 매니페스트 디렉터리 하나를 Git에서 삭제했다. 그러면 Argo CD는 Application만 정리할까, 아니면 해당 Application의 관리 대상 리소스(workload)까지 정리할까?
 
 결론부터 말하면, 삭제 범위는 `prune: true` 하나로 결정되지 않는다. 어떤 controller가 어떤 리소스를 조정하는지, generated `Application`에 finalizer가 있는지, workload를 보존하는 정책이 켜져 있는지를 함께 봐야 한다. 이번 글에서는 ApplicationSet과 App-of-Apps를 같은 “상위 관리 구조”로 뭉뚱그리지 않고, Git 변경이 각 계층을 어떻게 통과하는지 따라가 본다.
+
+여기서 매니페스트 디렉터리는 Git 저장소 안에서 Argo CD `Application`의 `spec.source.path`가 가리키는 디렉터리를 뜻한다.
 
 ## 먼저 구성요소부터 짚고 간다
 
