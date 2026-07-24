@@ -1,4 +1,4 @@
-colorScheme = "blowfish"
+colorScheme = "terminal"
 defaultAppearance = "light"
 autoSwitchAppearance = true
 enableSearch = true
