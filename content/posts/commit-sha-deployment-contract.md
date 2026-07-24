@@ -22,6 +22,19 @@ title = '배포할 이미지는 누가 결정할까 — GitOps에 커밋 SHA를 
 
 > **이미지를 만들었다는 사실과 그 이미지를 배포하겠다는 결정은 다르다. 배포 결정은 변경 불가능한 커밋 SHA를 Git의 desired state에 남겨야 한다.**
 
+{{< mermaid >}}
+flowchart LR
+  source[소스 커밋<br/>commit-sha] --> build[CI 빌드·push]
+  build --> latest[latest<br/>편의용 별칭]
+  build --> image[이미지<br/>commit-sha 태그]
+  image -->|태그 불변성| gitops[GitOps 저장소<br/>newTag = commit-sha]
+  gitops -->|desired state| argo[Argo CD sync]
+  argo --> pod[실행 중인 Pod]
+
+  classDef contract fill:#e8f2ff,stroke:#2563eb,color:#1e3a8a
+  class image,gitops,pod contract
+{{< /mermaid >}}
+
 ## `latest`는 편하지만 배포 이력은 아니다
 
 가변 태그는 사람이 최근 이미지를 찾을 때 편하다. 하지만 같은 이름이 다음 빌드에서 다른 이미지를 가리킬 수 있다. 이 상태에서 Deployment가 `latest`를 참조하면, Git의 매니페스트만 보고는 어떤 소스 버전이 실행 중인지 알 수 없다.
@@ -88,6 +101,20 @@ CI가 만든 태그 커밋에는 `[ci skip]`을 붙였다. 매니페스트 변�
 ## 롤백은 새 이미지를 만드는 일이 아니었다
 
 문제가 생겼을 때 롤백은 `latest`를 다시 붙이는 일이 아니다. 이전에 검증한 SHA로 GitOps overlay를 되돌리는 일이다.
+
+{{< mermaid >}}
+sequenceDiagram
+  participant Operator as 작업자
+  participant GitOps as GitOps 저장소
+  participant Argo as Argo CD
+  participant Cluster as 클러스터
+
+  Note over GitOps,Cluster: 현재 desired state: commit-sha-b
+  Operator->>GitOps: newTag를 commit-sha-a로 변경
+  GitOps->>Argo: 변경된 desired state
+  Argo->>Cluster: commit-sha-a 이미지로 동기화
+  Note over GitOps,Cluster: 이전에 검증한 버전 실행
+{{< /mermaid >}}
 
 ```text
 현재 desired state:  <commit-sha-b>
