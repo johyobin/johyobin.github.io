@@ -1,0 +1,9 @@
+[[main]]
+  name = "포트폴리오"
+  pageRef = "portfolio"
+  weight = 10
+
+[[main]]
+  name = "글"
+  pageRef = "posts"
+  weight = 20

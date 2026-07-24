@@ -1,0 +1,25 @@
+colorScheme = "blowfish"
+defaultAppearance = "light"
+autoSwitchAppearance = true
+enableSearch = true
+enableCodeCopy = true
+
+[homepage]
+  layout = "page"
+  showRecent = true
+  showRecentItems = 5
+  showMoreLink = true
+  showMoreLinkDest = "/posts/"
+
+[article]
+  showDate = true
+  showAuthor = false
+  showBreadcrumbs = true
+  showPagination = true
+  showReadingTime = true
+  showTableOfContents = true
+  showWordCount = false
+
+[list]
+  showBreadcrumbs = true
+  showSummary = true

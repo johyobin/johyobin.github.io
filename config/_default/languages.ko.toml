@@ -1,0 +1,12 @@
+disabled = false
+locale = "ko-kr"
+label = "한국어"
+weight = 1
+title = "johyobin's devops blog"
+
+[params]
+  displayName = "KO"
+  isoCode = "ko"
+  rtl = false
+  dateFormat = "2006년 1월 2일"
+  description = "DevOps와 SRE 운영 경험을 기록하는 블로그"
