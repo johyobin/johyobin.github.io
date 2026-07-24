@@ -5,7 +5,8 @@ enableSearch = true
 enableCodeCopy = true
 
 [homepage]
-  layout = "page"
+  layout = "hero"
+  homepageImage = "hero-terminal.svg"
   showRecent = true
   showRecentItems = 5
   showMoreLink = true
