@@ -1,0 +1,31 @@
+/* Keep Mermaid diagrams readable without changing the article layout. */
+.article-content .mermaid {
+  box-sizing: border-box;
+  width: 100%;
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid rgb(var(--color-neutral-700));
+  border-radius: 0.5rem;
+  background: rgb(var(--color-neutral-800));
+}
+
+.article-content .mermaid > svg {
+  display: block;
+  min-width: 900px;
+  max-width: none;
+  height: auto;
+  margin-inline: auto;
+}
+
+@media (max-width: 639px) {
+  .article-content .mermaid {
+    margin-inline: 0;
+    padding: 0.75rem;
+  }
+
+  .article-content .mermaid > svg {
+    min-width: 720px;
+  }
+}
