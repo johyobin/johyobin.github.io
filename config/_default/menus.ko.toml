@@ -4,6 +4,11 @@
   weight = 10
 
 [[main]]
+  name = "시뮬레이터"
+  pageRef = "simulator"
+  weight = 15
+
+[[main]]
   name = "글"
   pageRef = "posts"
   weight = 20
