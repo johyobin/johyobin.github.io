@@ -9,6 +9,11 @@
   weight = 15
 
 [[main]]
+  name = "기술 진화 지도"
+  pageRef = "tech-evolution-map"
+  weight = 18
+
+[[main]]
   name = "글"
   pageRef = "posts"
   weight = 20
