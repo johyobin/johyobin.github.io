@@ -20,16 +20,14 @@ showTableOfContents = false
     </div>
     <span id="incident-status" class="incident-badge is-critical">조사 필요</span>
   </header>
-
   <div class="simulator-summary" aria-label="현재 운영 상태">
     <article class="signal-card"><span>5xx 오류율</span><strong id="error-rate">12.8%</strong><small id="error-note">SLO 1% 초과</small></article>
     <article class="signal-card"><span>p95 응답 시간</span><strong id="latency">1.9s</strong><small id="latency-note">평소 240ms</small></article>
     <article class="signal-card"><span>영향 요청</span><strong id="impact">1,284</strong><small id="impact-note">최근 10분</small></article>
     <article class="signal-card"><span>실행 버전</span><strong id="version">2026.07.25-2</strong><small id="version-note">14:02 배포</small></article>
   </div>
-
   <div class="simulator-workspace">
-    <section class="simulator-panel" aria-labelledby="evidence-title">
+    <div class="simulator-panel" aria-labelledby="evidence-title">
       <div class="panel-heading"><p class="simulator-eyebrow">EVIDENCE</p><h3 id="evidence-title">확인 가능한 신호</h3></div>
       <div class="evidence-actions">
         <button type="button" class="simulator-button" data-action="deploy">최근 배포 확인</button>
@@ -39,24 +37,21 @@ showTableOfContents = false
       <div id="evidence-output" class="evidence-output" role="status" aria-live="polite">
         아직 확인한 신호가 없습니다. 증상만으로 대응하지 말고, 근거부터 좁혀 보세요.
       </div>
-    </section>
-
-    <section class="simulator-panel" aria-labelledby="decision-title">
+    </div>
+    <div class="simulator-panel" aria-labelledby="decision-title">
       <div class="panel-heading"><p class="simulator-eyebrow">DECISION</p><h3 id="decision-title">대응 선택</h3></div>
       <div class="decision-list">
         <button type="button" class="decision-button" data-action="restart"><span>서비스 재시작</span><small>증상을 일시적으로 완화할 수 있음</small></button>
         <button type="button" class="decision-button" data-action="scale"><span>인스턴스 확장</span><small>용량 부족일 때만 효과적</small></button>
         <button type="button" class="decision-button is-primary" data-action="rollback"><span>이전 버전으로 롤백</span><small>변경과 증상의 상관관계를 빠르게 차단</small></button>
       </div>
-    </section>
+    </div>
   </div>
-
-  <section id="debrief" class="simulator-debrief" hidden aria-labelledby="debrief-title">
+  <div id="debrief" class="simulator-debrief" hidden aria-labelledby="debrief-title">
     <p class="simulator-eyebrow">DEBRIEF</p>
     <h3 id="debrief-title">판단 결과</h3>
     <div id="debrief-output"></div>
-  </section>
-
+  </div>
   <footer class="simulator-footer">
     <p id="timeline">14:02 · checkout-api 2026.07.25-2 배포 완료</p>
     <button type="button" class="simulator-reset" data-action="reset">시나리오 다시 시작</button>
