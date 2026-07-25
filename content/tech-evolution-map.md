@@ -1,7 +1,7 @@
 +++
 title = '기술 진화 지도'
 url = '/tech-evolution-map/'
-layout = 'single'
+layout = 'tech-evolution-map'
 date = '2026-07-25T00:00:00+09:00'
 draft = false
 showTableOfContents = false

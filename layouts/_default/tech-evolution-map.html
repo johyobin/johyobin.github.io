@@ -1,0 +1,25 @@
+{{ define "main" }}
+  <article class="tech-evolution-map-page">
+    <header id="single_header" class="mt-5 max-w-full">
+      {{ if .Params.showBreadcrumbs | default (site.Params.article.showBreadcrumbs | default false) }}
+        {{ partial "breadcrumbs.html" . }}
+      {{ end }}
+      <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+        {{ .Title | emojify }}
+      </h1>
+      <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
+        {{ partial "article-meta/basic.html" (dict "context" . "scope" "single") }}
+      </div>
+    </header>
+
+    <section class="mt-0 prose dark:prose-invert max-w-none">
+      <div class="article-content max-w-none mb-20">
+        {{ .Content }}
+      </div>
+    </section>
+
+    <footer class="pt-8 max-w-full print:hidden">
+      {{ partial "article-pagination.html" . }}
+    </footer>
+  </article>
+{{ end }}
