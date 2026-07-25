@@ -85,6 +85,10 @@
 .simulator-debrief { margin: 0 1.25rem 1.25rem; padding: 1rem; border-left: 3px solid #f59e0b; border-radius: 0.4rem; background: rgb(var(--color-neutral-900)); }
 .simulator-debrief:focus { outline: 2px solid #7dd3fc; outline-offset: 3px; }
 .simulator-debrief.is-success { border-color: #34d399; }
+.outcome-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+.outcome-card { padding: 0.7rem; border: 1px solid rgb(var(--color-neutral-700)); border-radius: 0.4rem; }
+.outcome-card span, .outcome-card small { display: block; color: rgb(var(--color-neutral-400)); font-size: 0.76rem; }
+.outcome-card strong { display: block; margin-block: 0.25rem; color: inherit; font-size: 1rem; }
 .simulator-debrief h4 { margin: 0 0 0.45rem; }
 .simulator-debrief p { margin: 0; color: rgb(var(--color-neutral-300)); }
 .simulator-footer { border-top: 1px solid rgb(var(--color-neutral-700)); }
@@ -99,5 +103,6 @@
 
 @media (max-width: 460px) {
   .simulator-summary { grid-template-columns: 1fr; }
+  .outcome-summary { grid-template-columns: 1fr; }
   .simulator-header, .simulator-footer { align-items: flex-start; flex-direction: column; }
 }

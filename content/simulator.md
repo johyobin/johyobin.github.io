@@ -59,6 +59,11 @@ showTableOfContents = false
   <div id="debrief" class="simulator-debrief" hidden aria-labelledby="debrief-title" tabindex="-1">
     <p class="simulator-eyebrow">DEBRIEF</p>
     <h3 id="debrief-title">판단 결과</h3>
+    <div id="outcome-summary" class="outcome-summary" aria-label="대응 결과 요약" aria-live="polite">
+      <article class="outcome-card"><span>경과 시간</span><strong id="resolution-time">—</strong><small id="resolution-note">대응 후 결과</small></article>
+      <article class="outcome-card"><span>최종 영향 요청</span><strong id="outcome-impact">—</strong><small id="outcome-impact-note">대응 후 누적</small></article>
+      <article class="outcome-card"><span>운영 비용·낭비</span><strong id="outcome-cost">—</strong><small id="outcome-cost-note">대응에 따른 추가 부담</small></article>
+    </div>
     <div id="debrief-output"></div>
   </div>
   <footer class="simulator-footer">
