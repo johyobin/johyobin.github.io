@@ -20,6 +20,14 @@ showTableOfContents = false
     </div>
     <span id="incident-status" class="incident-badge is-critical">조사 필요</span>
   </header>
+  <div class="simulator-progress" aria-label="시나리오 진행 상태">
+    <p id="simulator-instruction" class="simulator-instruction" role="status" aria-live="polite">1단계: 확인 가능한 신호를 먼저 살펴보세요. 최소 두 가지를 비교하면 대응 판단이 쉬워집니다.</p>
+    <ol class="simulator-steps">
+      <li class="simulator-step is-current" data-step="evidence" aria-current="step"><span class="step-number">1</span><span><strong>신호 확인</strong><small id="evidence-progress">0/3개 확인</small></span></li>
+      <li class="simulator-step" data-step="decision"><span class="step-number">2</span><span><strong>대응 선택</strong><small>근거를 바탕으로 선택</small></span></li>
+      <li class="simulator-step" data-step="debrief"><span class="step-number">3</span><span><strong>판단 결과</strong><small>대응의 영향을 확인</small></span></li>
+    </ol>
+  </div>
   <div class="simulator-summary" aria-label="현재 운영 상태">
     <article class="signal-card"><span>5xx 오류율</span><strong id="error-rate">12.8%</strong><small id="error-note">SLO 1% 초과</small></article>
     <article class="signal-card"><span>p95 응답 시간</span><strong id="latency">1.9s</strong><small id="latency-note">평소 240ms</small></article>
@@ -40,6 +48,7 @@ showTableOfContents = false
     </div>
     <div class="simulator-panel" aria-labelledby="decision-title">
       <div class="panel-heading"><p class="simulator-eyebrow">DECISION</p><h3 id="decision-title">대응 선택</h3></div>
+      <p id="decision-guidance" class="decision-guidance">신호를 확인한 뒤, 가장 적절한 대응을 선택하세요.</p>
       <div class="decision-list">
         <button type="button" class="decision-button" data-action="restart"><span>서비스 재시작</span><small>증상을 일시적으로 완화할 수 있음</small></button>
         <button type="button" class="decision-button" data-action="scale"><span>인스턴스 확장</span><small>용량 부족일 때만 효과적</small></button>
@@ -47,7 +56,7 @@ showTableOfContents = false
       </div>
     </div>
   </div>
-  <div id="debrief" class="simulator-debrief" hidden aria-labelledby="debrief-title">
+  <div id="debrief" class="simulator-debrief" hidden aria-labelledby="debrief-title" tabindex="-1">
     <p class="simulator-eyebrow">DEBRIEF</p>
     <h3 id="debrief-title">판단 결과</h3>
     <div id="debrief-output"></div>

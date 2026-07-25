@@ -3,6 +3,36 @@
   let state = { ...initial, checked: new Set() };
   const $ = (id) => document.getElementById(id);
 
+  function setStep(current) {
+    const order = ['evidence', 'decision', 'debrief'];
+    const currentIndex = order.indexOf(current);
+    document.querySelectorAll('.simulator-step').forEach((step) => {
+      const index = order.indexOf(step.dataset.step);
+      step.classList.toggle('is-complete', index < currentIndex);
+      step.classList.toggle('is-current', index === currentIndex);
+      if (index === currentIndex) step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    });
+  }
+
+  function updateGuidance() {
+    const checkedCount = state.checked.size;
+    $('evidence-progress').textContent = `${checkedCount}/3개 확인`;
+    if (state.action) {
+      setStep('debrief');
+      $('simulator-instruction').textContent = '3단계: 판단 결과를 확인하세요. 시나리오를 다시 시작해 다른 대응도 비교할 수 있습니다.';
+      $('decision-guidance').textContent = '대응을 선택했습니다. 아래 판단 결과에서 영향과 다음 확인 항목을 살펴보세요.';
+    } else if (checkedCount > 0) {
+      setStep('decision');
+      $('simulator-instruction').textContent = `2단계: 신호 ${checkedCount}/3개를 확인했습니다. 이제 근거를 바탕으로 대응을 선택하세요.`;
+      $('decision-guidance').textContent = `확인한 신호 ${checkedCount}/3개. 대응을 선택하면 판단 결과를 볼 수 있습니다.`;
+    } else {
+      setStep('evidence');
+      $('simulator-instruction').textContent = '1단계: 확인 가능한 신호를 먼저 살펴보세요. 최소 두 가지를 비교하면 대응 판단이 쉬워집니다.';
+      $('decision-guidance').textContent = '신호를 확인한 뒤, 가장 적절한 대응을 선택하세요.';
+    }
+  }
+
   const evidence = {
     deploy: '<strong>배포 이벤트</strong><br>14:02 · <code>2026.07.25-2</code>가 배포됐습니다. 직전 버전은 <code>2026.07.18-1</code>입니다. 오류율 증가는 배포 90초 뒤부터 시작했습니다.',
     logs: '<strong>오류 로그</strong><br><code>PaymentClient: connect ETIMEDOUT payment-gateway</code><br>새 버전에서 결제 게이트웨이 연결 timeout 값이 3초에서 500ms로 변경됐습니다.',
@@ -13,12 +43,16 @@
     state.checked.add(kind);
     $('evidence-output').innerHTML = evidence[kind];
     document.querySelector(`[data-action="${kind}"]`).classList.add('is-checked');
+    updateGuidance();
   }
 
   function debrief(title, body, success) {
     $('debrief').hidden = false;
     $('debrief').classList.toggle('is-success', success);
     $('debrief-output').innerHTML = `<h4>${title}</h4><p>${body}</p>`;
+    updateGuidance();
+    $('debrief').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    $('debrief').focus({ preventScroll: true });
   }
 
   function respond(action) {
@@ -53,6 +87,7 @@
     $('timeline').textContent = '14:02 · checkout-api 2026.07.25-2 배포 완료';
     $('debrief').hidden = true;
     document.querySelectorAll('.is-checked').forEach((item) => item.classList.remove('is-checked'));
+    updateGuidance();
   }
 
   document.querySelector('.incident-simulator').addEventListener('click', (event) => {
