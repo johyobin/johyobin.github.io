@@ -23,6 +23,8 @@
 | CSS | [W3C CSS1 Recommendation](https://www.w3.org/TR/REC-CSS1/) | CSS는 문서 구조와 표현을 분리하는 스타일시트 언어를 정의한다. |
 | REST / 웹 API | [Fielding, *Architectural Styles…* (2000)](https://www.ics.uci.edu/~fielding/pubs/dissertation/fielding_dissertation.pdf) | REST는 컴포넌트·커넥터·데이터 요소 제약으로 웹 규모의 분산 하이퍼미디어 시스템을 설명한다. |
 | AJAX / 비동기 웹 | [W3C XMLHttpRequest](https://www.w3.org/TR/XMLHttpRequest/) | XMLHttpRequest는 사용자 에이전트가 전체 페이지 탐색 없이 HTTP 요청을 수행하도록 정의한다. |
+| 모놀리스 | [Microsoft Learn: Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) | 모놀리스의 핵심 동작은 하나의 프로세스에서 실행되고 대체로 하나의 배포 단위로 배포된다. 논리 계층의 유무와는 별개다. |
+| 계층형 애플리케이션 | [Microsoft Learn: N-tier architecture style](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/n-tier) | N-tier는 논리 계층과 물리적으로 분리 가능한 티어로 구성하며, 전통적 3-tier는 표현·중간·데이터 티어를 둔다. |
 
 ## 3. 대규모 분산 시스템 (2006–2012)
 
