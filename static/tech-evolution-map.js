@@ -13,12 +13,18 @@
   const referenceById = new Map(data.references.map((reference) => [reference.id, reference]));
   const causalReferenceById = new Map(data.causalReferences.map((reference) => [reference.id, reference]));
   const nodeById = new Map(data.nodes.map((node) => [node.id, node]));
+  const extensionsByNode = (data.extensions || []).reduce((counts, extension) => {
+    counts.set(extension.mainNodeId, (counts.get(extension.mainNodeId) || 0) + 1);
+    return counts;
+  }, new Map());
   const selectedFromUrl = new URLSearchParams(window.location.search).get('node');
   let state = { selected: nodeById.has(selectedFromUrl) ? selectedFromUrl : 'http', era: 'all', detailed: false };
   const escape = (value) => String(value).replace(/[&<>"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[character]);
 
   function nodeButton(node) {
-    return `<button type="button" class="tem-node domain-${node.domain}" data-node="${node.id}" aria-pressed="${node.id === state.selected}"><span class="tem-node-year">${node.mapYear}</span><strong>${escape(node.title)}</strong><span>${escape(node.english)}</span></button>`;
+    const extensionCount = extensionsByNode.get(node.id) || 0;
+    const extensionBadge = extensionCount ? `<span class="tem-node-extension" aria-label="심화 내용 ${extensionCount}개">심화 ${extensionCount}</span>` : '';
+    return `<button type="button" class="tem-node domain-${node.domain}" data-node="${node.id}" aria-pressed="${node.id === state.selected}"><span class="tem-node-year">${node.mapYear}</span><strong>${escape(node.title)}</strong><span class="tem-node-english">${escape(node.english)}</span>${extensionBadge}</button>`;
   }
 
   function connectionEvidence(link, other, direction) {
