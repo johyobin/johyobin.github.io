@@ -13,7 +13,8 @@
   const referenceById = new Map(data.references.map((reference) => [reference.id, reference]));
   const causalReferenceById = new Map(data.causalReferences.map((reference) => [reference.id, reference]));
   const nodeById = new Map(data.nodes.map((node) => [node.id, node]));
-  let state = { selected: 'http', era: 'all', detailed: false };
+  const selectedFromUrl = new URLSearchParams(window.location.search).get('node');
+  let state = { selected: nodeById.has(selectedFromUrl) ? selectedFromUrl : 'http', era: 'all', detailed: false };
   const escape = (value) => String(value).replace(/[&<>"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[character]);
 
   function nodeButton(node) {
@@ -40,8 +41,10 @@
     const node = nodeById.get(state.selected);
     const reference = referenceById.get(node.sourceId);
     const related = data.links.filter((link) => link.from === node.id || link.to === node.id);
+    const extensions = (data.extensions || []).filter((extension) => extension.mainNodeId === node.id);
     const grouped = ['why', 'solved', 'enabled'].map((field) => `<div><dt>${({ why: '왜 등장했나', solved: '무엇을 해결했나', enabled: '무엇을 가능하게 했나' })[field]}</dt><dd>${escape(node[field])}</dd></div>`).join('');
-    return `<aside class="tem-detail" aria-live="polite" aria-labelledby="tem-detail-title"><div class="tem-detail-kicker"><span class="tem-domain">${node.domain}</span><span>지도 연도 ${node.mapYear}</span></div><h2 id="tem-detail-title">${escape(node.title)} <small>${escape(node.english)}</small></h2><dl class="tem-story">${grouped}</dl><section class="tem-ops"><h3>DevOps 관점</h3><div><strong>운영 질문</strong><p>${escape(node.ops)}</p></div><div><strong>도구·관행</strong><p>${escape(node.tools)}</p></div><div><strong>아키텍처·트레이드오프</strong><p>${escape(node.architecture)}</p></div></section><section class="tem-connections"><h3>인과 연결 검증</h3><p>모든 화살표는 메커니즘·시간 근거·출처를 갖는 검증 대상입니다.</p><ul>${related.map((link) => { const other = nodeById.get(link.from === node.id ? link.to : link.from); return connectionEvidence(link, other, link.from === node.id ? '→' : '←'); }).join('')}</ul></section><p class="tem-reference"><strong>노드 출처</strong><a href="${reference.url}" target="_blank" rel="noopener noreferrer">${escape(reference.title)} <span aria-hidden="true">↗</span></a></p></aside>`;
+    const extensionHtml = extensions.length ? `<section class="tem-extensions"><h3>심화 내용</h3><p>지도의 핵심 흐름을 벗어나지 않고, 다음 질문으로 더 깊게 읽는다.</p><ul>${extensions.map((extension) => `<li><a href="${extension.url}"><strong>${escape(extension.title)}</strong><span>${escape(extension.description)} →</span></a></li>`).join('')}</ul></section>` : '';
+    return `<aside class="tem-detail" aria-live="polite" aria-labelledby="tem-detail-title"><div class="tem-detail-kicker"><span class="tem-domain">${node.domain}</span><span>지도 연도 ${node.mapYear}</span></div><h2 id="tem-detail-title">${escape(node.title)} <small>${escape(node.english)}</small></h2><dl class="tem-story">${grouped}</dl><section class="tem-ops"><h3>DevOps 관점</h3><div><strong>운영 질문</strong><p>${escape(node.ops)}</p></div><div><strong>도구·관행</strong><p>${escape(node.tools)}</p></div><div><strong>아키텍처·트레이드오프</strong><p>${escape(node.architecture)}</p></div></section>${extensionHtml}<section class="tem-connections"><h3>인과 연결 검증</h3><p>모든 화살표는 메커니즘·시간 근거·출처를 갖는 검증 대상입니다.</p><ul>${related.map((link) => { const other = nodeById.get(link.from === node.id ? link.to : link.from); return connectionEvidence(link, other, link.from === node.id ? '→' : '←'); }).join('')}</ul></section><p class="tem-reference"><strong>노드 출처</strong><a href="${reference.url}" target="_blank" rel="noopener noreferrer">${escape(reference.title)} <span aria-hidden="true">↗</span></a></p></aside>`;
   }
 
   function graph() {

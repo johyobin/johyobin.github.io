@@ -185,6 +185,71 @@ window.techEvolutionMap = (() => {
   ]);
   const auditedNodes = nodes.filter((node) => auditedNodeIds.has(node.id));
   const nodeById = Object.fromEntries(auditedNodes.map((node) => [node.id, node]));
+  const extensions = [
+    {
+      id: 'transactions-and-schema',
+      mainNodeId: 'relational-data',
+      title: '트랜잭션·스키마 설계',
+      description: '동시 변경과 스키마 변화 속에서도 데이터 정합성을 지키기 위해 무엇을 격리하고 언제 변경할지 읽는다.',
+      url: '/tech-evolution-map/extensions/transactions-and-schema/'
+    },
+    {
+      id: 'web-presentation-layer',
+      mainNodeId: 'html',
+      title: '웹 표현 계층',
+      description: '문서 구조와 표현을 나눈 선택이 접근성·재사용·성능 검증에 주는 영향을 읽는다.',
+      url: '/tech-evolution-map/extensions/web-presentation-layer/'
+    },
+    {
+      id: 'web-api-design',
+      mainNodeId: 'http',
+      title: '웹 API 설계',
+      description: 'HTTP의 리소스·무상태성·캐시 제약을 API 계약과 운영 비용의 관점에서 읽는다.',
+      url: '/tech-evolution-map/extensions/web-api-design/'
+    },
+    {
+      id: 'browser-interactions',
+      mainNodeId: 'javascript',
+      title: '브라우저 상호작용',
+      description: '비동기 요청과 부분 갱신이 만든 사용자 경험·클라이언트 상태·API 부하의 균형을 읽는다.',
+      url: '/tech-evolution-map/extensions/browser-interactions/'
+    },
+    {
+      id: 'application-architecture',
+      mainNodeId: 'cgi',
+      title: '애플리케이션 아키텍처',
+      description: '모놀리스·계층형·마이크로서비스를 배포·통신·책임 경계의 선택으로 비교한다.',
+      url: '/tech-evolution-map/extensions/application-architecture/'
+    },
+    {
+      id: 'load-balancing',
+      mainNodeId: 'cdn',
+      title: '로드 밸런싱',
+      description: '트래픽 분산과 장애 격리가 세션·상태·헬스 체크라는 운영 책임을 어떻게 만드는지 읽는다.',
+      url: '/tech-evolution-map/extensions/load-balancing/'
+    },
+    {
+      id: 'configuration-management-and-iac',
+      mainNodeId: 'iaas',
+      title: '구성 관리 자동화·IaC',
+      description: '원하는 상태를 선언·검토·재현하면서 드리프트와 변경 위험을 다루는 방식을 읽는다.',
+      url: '/tech-evolution-map/extensions/configuration-management-and-iac/'
+    },
+    {
+      id: 'ci-cd',
+      mainNodeId: 'dvcs',
+      title: 'CI/CD',
+      description: '변경을 자주 통합하고 언제든 배포 가능한 상태를 유지하기 위한 검증·복구 흐름을 읽는다.',
+      url: '/tech-evolution-map/extensions/ci-cd/'
+    },
+    {
+      id: 'slo-and-error-budget',
+      mainNodeId: 'kubernetes',
+      title: 'SLO·오류 예산',
+      description: '사용자 관점 신뢰성 목표와 허용 실패량으로 안정성·변경 속도를 함께 판단하는 방식을 읽는다.',
+      url: '/tech-evolution-map/extensions/slo-and-error-budget/'
+    }
+  ];
 
   Object.assign(nodeById.html, {
     title: 'HTML', english: 'HyperText Markup Language',
@@ -279,5 +344,5 @@ window.techEvolutionMap = (() => {
       mechanism: causalClaims[link.id],
       temporalBasis: '관계별 1차·공식 출처가 지지하는 좁은 구현 또는 역사적 범위로 검증함.'
     } }));
-  return { eras, nodes: auditedNodes, links: reviewedLinks, references, causalReferences };
+  return { eras, nodes: auditedNodes, links: reviewedLinks, references, causalReferences, extensions };
 })();

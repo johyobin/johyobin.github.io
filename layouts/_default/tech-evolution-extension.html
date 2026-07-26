@@ -1,0 +1,33 @@
+{{ define "main" }}
+  <article class="tem-extension-page">
+    <nav class="tem-extension-breadcrumb" aria-label="현재 위치">
+      <a href="/tech-evolution-map/">기술 진화 지도</a>
+      <span aria-hidden="true">/</span>
+      <a href="/tech-evolution-map/?node={{ .Params.mainNode | urlquery }}">{{ .Params.mainNodeTitle }}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ .Title }}</span>
+    </nav>
+
+    <header class="tem-extension-hero">
+      <p>EXPANSION</p>
+      <h1>{{ .Title }}</h1>
+      {{ with .Params.summary }}<p>{{ . }}</p>{{ end }}
+    </header>
+
+    <div class="tem-extension-content article-content">
+      {{ .Content }}
+    </div>
+
+    {{ with .Params.next }}
+      <section class="tem-next-extensions" aria-labelledby="tem-next-title">
+        <p>CONTINUE EXPLORING</p>
+        <h2 id="tem-next-title">다음으로 읽기</h2>
+        <ul>
+          {{ range . }}
+            <li><a href="{{ .url }}"><strong>{{ .title }}</strong><span>{{ .description }} →</span></a></li>
+          {{ end }}
+        </ul>
+      </section>
+    {{ end }}
+  </article>
+{{ end }}
