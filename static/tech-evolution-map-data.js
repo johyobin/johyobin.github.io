@@ -154,5 +154,92 @@ window.techEvolutionMap = (() => {
     L('gfs','mapreduce','enables',true), L('mapreduce','bigtable','enables',true), L('paxos','bigtable','solves'), L('bigtable','kafka','enables',true), L('virtualization','iaas','enables',true), L('iaas','containers','enables',true), L('config-management','iac','enables',true), L('iac','kubernetes','enables',true), L('containers','kubernetes','enables',true), L('cicd','gitops','transforms',true), L('microservices','kubernetes','enables'),
     L('kubernetes','gitops','enables',true), L('kubernetes','service-mesh','enables'), L('microservices','service-mesh','solves'), L('service-mesh','observability','enables'), L('kubernetes','observability','enables',true), L('observability','slo','enables',true), L('slo','error-budget','enables',true), L('gitops','idp','enables',true), L('cicd','supply-chain','transforms'), L('iac','policy','enables'), L('idp','policy','enables'), L('supply-chain','tool-calling','enables'), L('policy','tool-calling','solves'), L('tool-calling','agent-evals','enables',true), L('llm-agents','tool-calling','enables',true), L('observability','agent-evals','enables')
   ];
-  return { eras, nodes, links, references, causalReferences };
+  // The first public map keeps only independently auditable technologies.
+  // Practices, architecture styles, and governance frameworks live in node extensions.
+  const auditedNodeIds = new Set([
+    'packet-switching', 'tcp-ip', 'dns', 'www', 'http', 'html', 'relational-data',
+    'cgi', 'javascript', 'virtualization', 'iaas', 'kafka', 'containers', 'kubernetes'
+  ]);
+  const auditedNodes = nodes.filter((node) => auditedNodeIds.has(node.id));
+  const nodeById = Object.fromEntries(auditedNodes.map((node) => [node.id, node]));
+
+  Object.assign(nodeById.html, {
+    title: 'HTML', english: 'HyperText Markup Language',
+    why: '웹 문서를 서로 다른 시스템에서 같은 방식으로 교환할 구조 형식이 필요했다.',
+    solved: '하이퍼텍스트 문서의 구조를 표준화했다.',
+    enabled: '브라우저 기반의 보편적 문서 표현이 가능해졌다.'
+  });
+  Object.assign(nodeById['relational-data'], {
+    mapYear: 1986, title: '관계형 데이터베이스', english: 'Relational Database',
+    why: '애플리케이션이 저장 형식에 직접 묶이면 변경 비용이 커졌다.',
+    solved: '관계 모델과 표준 질의 언어로 데이터 독립성을 높였다.',
+    enabled: '표준화된 데이터 접근과 신뢰 가능한 상태 저장의 기반이 됐다.',
+    ops: '백업·복구 목표와 쿼리 지연을 제품 요구와 연결한다.',
+    architecture: '트랜잭션과 스키마 설계는 이 노드의 확장 콘텐츠로 다룬다.'
+  });
+  Object.assign(nodeById.virtualization, {
+    mapYear: 1999, title: '서버 가상화', english: 'Server Virtualization',
+    why: '물리 서버 한 대를 한 워크로드가 독점하면 자원 활용과 격리가 모두 나빴다.',
+    enabled: '탄력적 IaaS와 격리된 실행 환경의 기반이 됐다.'
+  });
+  Object.assign(nodeById.kafka, {
+    title: '이벤트 스트리밍', english: 'Event Streaming',
+    why: '시스템 간 데이터 전달을 동기 호출에만 의존하면 결합과 병목이 커졌다.',
+    solved: '지속 로그 기반으로 이벤트를 기록·전달·재처리하는 방식을 제공했다.',
+    enabled: '비동기 통합과 실시간 데이터 파이프라인을 가능하게 했다.',
+    tools: 'Kafka (대표 구현), schema registry'
+  });
+  Object.assign(nodeById.containers, {
+    title: '컨테이너화', english: 'Containerization',
+    solved: '이미지와 실행 구성을 표준화해 애플리케이션을 이식 가능한 단위로 패키징했다.',
+    tools: 'Docker (대표 구현), OCI, container runtime'
+  });
+  Object.assign(nodeById.kubernetes, {
+    title: '컨테이너 오케스트레이션', english: 'Container Orchestration',
+    solved: '선언적으로 컨테이너 워크로드의 배치·복구·확장을 조정하는 플랫폼을 제공했다.',
+    tools: 'Kubernetes (대표 구현)'
+  });
+
+  references.push(
+    { id: 'url', title: 'RFC 1738: Uniform Resource Locators', url: 'https://www.rfc-editor.org/rfc/rfc1738' },
+    { id: 'sql', title: 'ANSI SQL-86 history', url: 'https://www.iso.org/standard/76583.html' },
+    { id: 'tls', title: 'RFC 2246: The TLS Protocol 1.0', url: 'https://www.rfc-editor.org/rfc/rfc2246.html' },
+    { id: 'browser', title: 'CERN: A Short History of the Web', url: 'https://home.cern/science/computing/birth-web/short-history-web' },
+    { id: 'linux', title: 'Linux kernel archives', url: 'https://www.kernel.org/' },
+    { id: 'cdn', title: 'Akamai: Content Delivery Network', url: 'https://www.akamai.com/glossary/what-is-a-cdn' },
+    { id: 'git', title: 'Git documentation', url: 'https://git-scm.com/doc' },
+    { id: 'serverless', title: 'AWS Lambda', url: 'https://aws.amazon.com/lambda/' }
+  );
+  auditedNodes.push(
+    N('url', 'web', 1995, 'URL', 'Uniform Resource Locator', 'network', '웹 자원의 위치와 식별자를 일관되게 표현할 규칙이 필요했다.', '리소스 주소의 공통 문법을 제공했다.', '브라우저가 링크를 해석하고 HTTP 요청을 보낼 수 있게 했다.', 'URL 변경·리디렉션·캐시 키를 호환성 계약으로 관리한다.', 'URL, reverse proxy', '식별자는 연결 가능한 웹의 최소 계약이다.', 'url'),
+    N('sql', 'foundations', 1986, 'SQL', 'Structured Query Language', 'database', '관계형 데이터를 구현마다 다른 방식으로 다루면 이식성과 질의가 어려웠다.', '관계형 데이터를 정의·질의하는 표준 언어를 제공했다.', '애플리케이션이 저장 구현과 분리된 데이터 접근을 할 수 있게 했다.', '쿼리 성능, 권한, 스키마 변경과 마이그레이션을 관리한다.', 'SQL, RDBMS', '표준 질의 언어는 데이터 계층의 결합도를 낮춘다.', 'sql'),
+    N('tls', 'web', 1999, 'TLS', 'Transport Layer Security', 'security', '인터넷 통신은 도청·변조·상대 인증 문제를 해결할 공통 보안 계층이 필요했다.', 'TCP 위에서 암호화·무결성·상대 인증을 제공했다.', 'HTTPS 기반 웹 서비스의 신뢰 경계가 됐다.', '인증서 수명주기, 종료 지점, 암호 정책을 관리한다.', 'TLS, certificate authority', '전송 보안은 애플리케이션 프로토콜과 분리된 공통 계층이다.', 'tls'),
+    N('browser', 'foundations', 1993, '웹 브라우저', 'Web Browser Runtime', 'frontend', '하이퍼텍스트 문서를 사람이 탐색하고 실행할 보편적 클라이언트가 필요했다.', 'URL을 해석하고 HTTP·HTML·스크립트를 사용자 환경에서 결합했다.', '웹이 연구 문서 시스템을 넘어 보편적 애플리케이션 플랫폼이 됐다.', '브라우저 호환성, 성능, 클라이언트 오류를 서비스 품질로 관리한다.', 'web browser', '클라이언트 런타임은 웹 표준이 만나는 실행 경계다.', 'browser'),
+    N('linux', 'foundations', 1991, 'Linux', 'Linux', 'infrastructure', '범용 하드웨어에서 확장 가능하고 수정 가능한 서버 운영체제가 필요했다.', '개방된 범용 운영체제와 프로세스·네트워크·파일 시스템 기반을 제공했다.', '클라우드 서버와 컨테이너의 실행 기반이 됐다.', '커널·패키지·권한·패치 수명주기를 운영한다.', 'Linux kernel, cgroups, namespaces', '운영체제의 격리와 자원 제어가 상위 실행 환경을 지탱한다.', 'linux'),
+    N('cdn', 'web', 1999, '콘텐츠 전송 네트워크', 'Content Delivery Network', 'infrastructure', '원본 서버 하나에서 전 세계 사용자에게 콘텐츠를 보내면 지연과 부하가 커졌다.', '가까운 엣지에서 콘텐츠를 캐시·전달하는 분산 계층을 제공했다.', '글로벌 웹 전달의 성능·가용성·보안 경계를 넓혔다.', '캐시 적중률, 원본 부하, 무효화, 엣지 장애를 관리한다.', 'CDN, edge cache', '전달 계층을 분산하면 원본의 한계를 사용자 가까이에서 완화한다.', 'cdn'),
+    N('dvcs', 'web', 2005, '분산 버전 관리', 'Distributed Version Control', 'devops', '변경 이력과 협업이 중앙 저장소·네트워크 연결에 과도하게 묶여 있었다.', '복제 가능한 전체 이력과 분산 병합 모델을 제공했다.', '변경을 검토·추적·자동화 입력으로 다루는 기술 기반이 됐다.', '브랜치 보호, 변경 추적, 비밀 유입, 이력 보존을 관리한다.', 'Git (대표 구현)', '변경 이력은 소프트웨어·인프라 전달의 감사 가능한 입력이다.', 'git'),
+    N('serverless', 'cloud', 2014, '서버리스 실행 환경', 'Serverless / FaaS', 'infrastructure', '작은 기능까지 서버 용량·운영체제·확장을 직접 관리하면 운영 부담이 컸다.', '요청·이벤트 단위로 코드를 실행하고 자동 확장하는 관리형 실행 환경을 제공했다.', '클라우드 실행 책임 경계와 이벤트 기반 설계를 바꿨다.', '콜드 스타트, 동시성, 권한, 비용 한도와 재시도를 관리한다.', 'AWS Lambda (대표 구현)', '서버 관리는 줄지만 실행·데이터·권한 책임은 남는다.', 'serverless')
+  );
+
+  causalClaims['packet-switching->tcp-ip'] = '이종 패킷망을 상호접속해야 했던 요구가 TCP/IP 인터넷워크 설계를 역사적으로 촉발했다.';
+  causalClaims['http->cgi'] = 'HTTP 요청을 받아 동적 응답을 생성하려면 웹 서버와 외부 프로그램 사이의 공통 인터페이스가 필요했다.';
+  causalClaims['relational-data->sql'] = '관계형 데이터 모델을 구현·질의하기 위한 표준 언어가 필요했다.';
+  causalClaims['tcp-ip->tls'] = 'TLS는 신뢰성 있는 전송 프로토콜 위에 보안 계층을 두도록 정의됐다.';
+  causalClaims['www->browser'] = '웹의 하이퍼텍스트 모델은 문서를 탐색하는 그래픽 클라이언트의 확산으로 이어졌다.';
+  causalClaims['url->browser'] = '브라우저는 URL을 해석해 웹 자원을 요청하고 표시한다.';
+  causalClaims['http->browser'] = '브라우저는 HTTP 요청·응답을 통해 웹 자원을 교환한다.';
+  causalClaims['html->browser'] = '브라우저는 HTML 문서를 해석해 사용자에게 표현한다.';
+  causalClaims['linux->containers'] = '컨테이너 실행은 Linux의 프로세스 격리와 자원 제어 기능을 활용한다.';
+  causalClaims['http->cdn'] = 'HTTP 캐시와 프록시 모델은 콘텐츠를 원본 밖에서 전달하는 CDN의 기술 기반이다.';
+  causalClaims['iaas->serverless'] = 'API 기반 클라우드 인프라 위에서 관리형 요청·이벤트 실행 환경이 제공됐다.';
+
+  const auditedLinks = [
+    ...links.filter((link) => ['packet-switching->tcp-ip', 'tcp-ip->dns', 'dns->www', 'www->http', 'http->html', 'virtualization->iaas', 'iaas->containers', 'containers->kubernetes'].includes(link.id)),
+    L('http', 'cgi', 'enables', true), L('relational-data', 'sql', 'enables', true),
+    L('tcp-ip', 'tls', 'enables', true), L('www', 'browser', 'enables', true),
+    L('url', 'browser', 'enables', true), L('http', 'browser', 'enables', true), L('html', 'browser', 'enables', true),
+    L('linux', 'containers', 'enables', true), L('http', 'cdn', 'enables', true),
+    L('iaas', 'serverless', 'enables', true)
+  ];
+  return { eras, nodes: auditedNodes, links: auditedLinks, references, causalReferences };
 })();
