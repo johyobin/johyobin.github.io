@@ -3,7 +3,12 @@
   const data = window.techEvolutionMap;
   if (!root || !data) return;
 
-  const types = { solves: '한계를 해결함', enables: '다음을 가능하게 함', transforms: '운영 방식을 전환함' };
+  const types = {
+    'historical-trigger': '역사적 촉발',
+    'design-prerequisite': '설계 전제',
+    'solves-a-limit': '한계 해결',
+    'operational-transition': '운영 전환'
+  };
   const verificationLabels = { verified: '근거 확인됨', 'needs-review': '검증 대기' };
   const referenceById = new Map(data.references.map((reference) => [reference.id, reference]));
   const causalReferenceById = new Map(data.causalReferences.map((reference) => [reference.id, reference]));

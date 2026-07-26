@@ -32,6 +32,19 @@ window.techEvolutionMap = (() => {
     ['causal-slo-budget', 'Google SRE Book: Embracing Risk', 'https://sre.google/sre-book/embracing-risk/']
   ].map(([id, title, url]) => ({ id, title, url }));
 
+  causalReferences.push(
+    { id: 'causal-packet-tcp', title: 'RFC 1120 §1: Internet Design History', url: 'https://www.rfc-editor.org/rfc/rfc1120.html#section-1' },
+    { id: 'causal-http-cgi', title: 'RFC 3875: CGI and HTTP request/response mapping', url: 'https://www.rfc-editor.org/rfc/rfc3875.html#section-6' },
+    { id: 'causal-relational-sql', title: 'ANSI X3.135-1986 (SQL-86), Foreword', url: 'https://www.govinfo.gov/content/pkg/GOVPUB-C13-34d692548be2e76a4af31ba0cf22c936/pdf/GOVPUB-C13-34d692548be2e76a4af31ba0cf22c936.pdf' },
+    { id: 'causal-tcp-tls', title: 'RFC 2246 §1: TLS over reliable transport', url: 'https://www.rfc-editor.org/rfc/rfc2246.html#section-1' },
+    { id: 'causal-www-browser', title: 'CERN: Information Management proposal', url: 'https://www.w3.org/History/1989/proposal.html' },
+    { id: 'causal-url-browser', title: 'RFC 1866 §2.1, §7: User agents and URIs', url: 'https://www.rfc-editor.org/rfc/rfc1866.html#section-7' },
+    { id: 'causal-http-browser', title: 'RFC 1866 §8.2.2: HTML forms and HTTP', url: 'https://www.rfc-editor.org/rfc/rfc1866.html#section-8.2.2' },
+    { id: 'causal-html-browser', title: 'RFC 1866 §2.1, §7.2: HTML user agents', url: 'https://www.rfc-editor.org/rfc/rfc1866.html#section-7.2' },
+    { id: 'causal-linux-containers', title: 'Docker: Kernel namespaces and control groups', url: 'https://docs.docker.com/engine/security/' },
+    { id: 'causal-http-cdn', title: 'RFC 9111 §1 / RFC 3040: HTTP caching and surrogates', url: 'https://www.rfc-editor.org/rfc/rfc3040.html#section-2' }
+  );
+
   // mapYear is the representative practical-adoption year used for timeline placement.
   const N = (id, era, mapYear, title, english, domain, why, solved, enabled, ops, tools, architecture, sourceId) => ({ id, era, mapYear: Number(mapYear), title, english, domain, why, solved, enabled, ops, tools, architecture, sourceId });
   const nodes = [
@@ -133,7 +146,17 @@ window.techEvolutionMap = (() => {
     'containers->kubernetes': ['causal-containers-kubernetes'],
     'cicd->gitops': ['causal-cicd-gitops'],
     'microservices->service-mesh': ['causal-microservices-mesh'],
-    'slo->error-budget': ['causal-slo-budget']
+    'slo->error-budget': ['causal-slo-budget'],
+    'packet-switching->tcp-ip': ['causal-packet-tcp'],
+    'http->cgi': ['causal-http-cgi'],
+    'relational-data->sql': ['causal-relational-sql'],
+    'tcp-ip->tls': ['causal-tcp-tls'],
+    'www->browser': ['causal-www-browser'],
+    'url->browser': ['causal-url-browser'],
+    'http->browser': ['causal-http-browser'],
+    'html->browser': ['causal-html-browser'],
+    'linux->containers': ['causal-linux-containers'],
+    'http->cdn': ['causal-http-cdn']
   };
 
   const L = (from, to, type, core = false) => {
@@ -221,25 +244,40 @@ window.techEvolutionMap = (() => {
     N('serverless', 'cloud', 2014, '서버리스 실행 환경', 'Serverless / FaaS', 'infrastructure', '작은 기능까지 서버 용량·운영체제·확장을 직접 관리하면 운영 부담이 컸다.', '요청·이벤트 단위로 코드를 실행하고 자동 확장하는 관리형 실행 환경을 제공했다.', '클라우드 실행 책임 경계와 이벤트 기반 설계를 바꿨다.', '콜드 스타트, 동시성, 권한, 비용 한도와 재시도를 관리한다.', 'AWS Lambda (대표 구현)', '서버 관리는 줄지만 실행·데이터·권한 책임은 남는다.', 'serverless')
   );
 
-  causalClaims['packet-switching->tcp-ip'] = '이종 패킷망을 상호접속해야 했던 요구가 TCP/IP 인터넷워크 설계를 역사적으로 촉발했다.';
-  causalClaims['http->cgi'] = 'HTTP 요청을 받아 동적 응답을 생성하려면 웹 서버와 외부 프로그램 사이의 공통 인터페이스가 필요했다.';
-  causalClaims['relational-data->sql'] = '관계형 데이터 모델을 구현·질의하기 위한 표준 언어가 필요했다.';
-  causalClaims['tcp-ip->tls'] = 'TLS는 신뢰성 있는 전송 프로토콜 위에 보안 계층을 두도록 정의됐다.';
-  causalClaims['www->browser'] = '웹의 하이퍼텍스트 모델은 문서를 탐색하는 그래픽 클라이언트의 확산으로 이어졌다.';
-  causalClaims['url->browser'] = '브라우저는 URL을 해석해 웹 자원을 요청하고 표시한다.';
-  causalClaims['http->browser'] = '브라우저는 HTTP 요청·응답을 통해 웹 자원을 교환한다.';
-  causalClaims['html->browser'] = '브라우저는 HTML 문서를 해석해 사용자에게 표현한다.';
-  causalClaims['linux->containers'] = '컨테이너 실행은 Linux의 프로세스 격리와 자원 제어 기능을 활용한다.';
-  causalClaims['http->cdn'] = 'HTTP 캐시와 프록시 모델은 콘텐츠를 원본 밖에서 전달하는 CDN의 기술 기반이다.';
-  causalClaims['iaas->serverless'] = 'API 기반 클라우드 인프라 위에서 관리형 요청·이벤트 실행 환경이 제공됐다.';
+  causalClaims['packet-switching->tcp-ip'] = '패킷 라디오·패킷 위성의 성공으로 이종 패킷망을 상호접속해야 한다는 문제가 제기됐고, 그 해법이 TCP/IP로 발전했다.';
+  causalClaims['http->cgi'] = 'CGI는 HTTP 서버가 클라이언트 요청에 동적으로 응답하도록 서버와 스크립트의 책임을 나눈 인터페이스다.';
+  causalClaims['relational-data->sql'] = 'SQL-86은 관계형 데이터베이스를 정의·질의·변경하는 인터페이스의 기능과 의미를 표준화했다.';
+  causalClaims['tcp-ip->tls'] = 'TLS 1.0의 Record Protocol은 TCP 같은 신뢰성 있는 전송 프로토콜 위에 계층화되도록 정의됐다.';
+  causalClaims['www->browser'] = '월드와이드웹 프로젝트는 하이퍼텍스트 정보를 탐색·표시하는 클라이언트 프로그램의 구현을 요구했다.';
+  causalClaims['url->browser'] = '웹 브라우저는 URL로 식별된 자원을 해석·탐색한다.';
+  causalClaims['http->browser'] = '웹 브라우저의 HTML 폼 제출은 HTTP 요청·응답 상호작용으로 정의됐다.';
+  causalClaims['html->browser'] = '웹 브라우저는 HTML 문서를 파싱하고, 링크를 따라 자원을 탐색하며, 문서 구조를 사용자에게 표현한다.';
+  causalClaims['linux->containers'] = 'Linux 컨테이너는 커널 namespace와 cgroup으로 프로세스를 격리하고 자원을 제어한다.';
+  causalClaims['http->cdn'] = 'HTTP의 캐시·프록시 의미론은 HTTP 콘텐츠를 원본 밖의 공유 중간 계층에서 전달하는 CDN 구성의 기반이다.';
 
   const auditedLinks = [
     ...links.filter((link) => ['packet-switching->tcp-ip', 'tcp-ip->dns', 'dns->www', 'www->http', 'http->html', 'virtualization->iaas', 'iaas->containers', 'containers->kubernetes'].includes(link.id)),
     L('http', 'cgi', 'enables', true), L('relational-data', 'sql', 'enables', true),
     L('tcp-ip', 'tls', 'enables', true), L('www', 'browser', 'enables', true),
     L('url', 'browser', 'enables', true), L('http', 'browser', 'enables', true), L('html', 'browser', 'enables', true),
-    L('linux', 'containers', 'enables', true), L('http', 'cdn', 'enables', true),
-    L('iaas', 'serverless', 'enables', true)
+    L('linux', 'containers', 'enables', true), L('http', 'cdn', 'enables', true)
   ];
-  return { eras, nodes: auditedNodes, links: auditedLinks, references, causalReferences };
+  const relationshipLabels = {
+    'packet-switching->tcp-ip': 'historical-trigger', 'tcp-ip->dns': 'design-prerequisite',
+    'dns->www': 'design-prerequisite', 'www->http': 'historical-trigger',
+    'http->html': 'design-prerequisite', 'virtualization->iaas': 'design-prerequisite',
+    'containers->kubernetes': 'design-prerequisite', 'http->cgi': 'design-prerequisite',
+    'relational-data->sql': 'design-prerequisite', 'tcp-ip->tls': 'design-prerequisite',
+    'www->browser': 'historical-trigger', 'url->browser': 'design-prerequisite',
+    'http->browser': 'design-prerequisite', 'html->browser': 'design-prerequisite',
+    'linux->containers': 'design-prerequisite', 'http->cdn': 'design-prerequisite'
+  };
+  const reviewedLinks = auditedLinks
+    .filter((link) => link.id !== 'iaas->containers')
+    .map((link) => ({ ...link, type: relationshipLabels[link.id], verification: {
+      ...link.verification,
+      mechanism: causalClaims[link.id],
+      temporalBasis: '관계별 1차·공식 출처가 지지하는 좁은 구현 또는 역사적 범위로 검증함.'
+    } }));
+  return { eras, nodes: auditedNodes, links: reviewedLinks, references, causalReferences };
 })();
