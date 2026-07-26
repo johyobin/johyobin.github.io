@@ -17,6 +17,21 @@ window.techEvolutionMap = (() => {
     ['idp', 'CNCF Platforms White Paper', 'https://tag-app-delivery.cncf.io/whitepapers/platforms/'], ['slsa', 'SLSA specification', 'https://slsa.dev/spec/v1.1/'], ['opa', 'Open Policy Agent: Policy Language', 'https://www.openpolicyagent.org/docs/latest/policy-language/'], ['react', 'ReAct', 'https://arxiv.org/abs/2210.03629'], ['function', 'OpenAI: Function calling', 'https://platform.openai.com/docs/guides/function-calling'], ['evals', 'OpenAI: Agent evals', 'https://platform.openai.com/docs/guides/agent-evals']
   ].map(([id, title, url]) => ({ id, title, url }));
 
+  // Link references are deliberately separate from node references: they justify a relationship claim.
+  const causalReferences = [
+    ['causal-tcp-dns', 'RFC 1034 §1: Domain Names', 'https://www.rfc-editor.org/rfc/rfc1034.html#section-1'],
+    ['causal-dns-www', 'RFC 1738 §3.1: URL host syntax', 'https://www.rfc-editor.org/rfc/rfc1738'],
+    ['causal-www-http', 'W3C: HTTP as implemented', 'https://www.w3.org/Protocols/HTTP/AsImplemented.html'],
+    ['causal-http-html', 'RFC 1866: HTML 2.0', 'https://www.rfc-editor.org/rfc/rfc1866.html'],
+    ['causal-monolith-ntier', 'Microsoft Learn: N-tier architecture style', 'https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/n-tier'],
+    ['causal-gfs-mapreduce', 'Google: MapReduce', 'https://research.google/pubs/mapreduce-simplified-data-processing-on-large-clusters/'],
+    ['causal-virtualization-iaas', 'Amazon EC2', 'https://aws.amazon.com/ec2/'],
+    ['causal-containers-kubernetes', 'Kubernetes Overview', 'https://kubernetes.io/docs/concepts/overview/'],
+    ['causal-cicd-gitops', 'OpenGitOps Principles', 'https://opengitops.dev/'],
+    ['causal-microservices-mesh', 'Istio: What is Istio?', 'https://istio.io/latest/about/service-mesh/'],
+    ['causal-slo-budget', 'Google SRE Book: Embracing Risk', 'https://sre.google/sre-book/embracing-risk/']
+  ].map(([id, title, url]) => ({ id, title, url }));
+
   const N = (id, era, year, title, english, domain, why, solved, enabled, ops, tools, architecture, sourceId) => ({ id, era, year, title, english, domain, why, solved, enabled, ops, tools, architecture, sourceId });
   const nodes = [
     N('packet-switching','foundations','1964','패킷 교환','Packet switching','network','전용 회선은 비싸고 단일 장애에 취약했다.','메시지를 작은 패킷으로 나눠 여러 경로로 전달했다.','공유 네트워크 위의 인터넷 프로토콜을 위한 토대가 됐다.','손실·지연·혼잡을 관측하고 실패를 정상 상태로 다룬다.','라우팅, 네트워크 모니터링','복원력은 단일 경로가 아니라 대체 경로에서 나온다.','packet'),
@@ -59,11 +74,84 @@ window.techEvolutionMap = (() => {
     N('agent-evals','ai','2024','에이전트 평가·운영','Agent evals','ai','모델·프롬프트·도구 변경이 워크플로 품질을 어떻게 바꾸는지 눈으로만 확인하기 어렵다.','워크플로와 도구 사용을 테스트해 회귀를 찾는 방법을 제공한다.','에이전트 변경을 일반 소프트웨어처럼 측정·배포·개선할 수 있게 했다.','성공률, 안전 위반, 비용, latency를 배포 전후에 비교한다.','eval suite, tracing','확률적 시스템도 명시적 평가 기준 없이는 안전하게 진화할 수 없다.','evals')
   ];
 
-  const L = (from, to, type, core = false) => ({ from, to, type, core });
+  const causalClaims = {
+    'packet-switching->tcp-ip': '패킷 단위의 공유·전달 모델이 이기종 네트워크를 잇는 프로토콜 계층의 전제가 됐다.',
+    'tcp-ip->dns': '공통 인터넷 주소 체계 위에서 사람이 읽는 이름을 분산 관리할 필요가 생겼다.',
+    'dns->www': '분산 문서의 안정적인 발견과 URL 해석에 이름-주소 변환이 필요했다.',
+    'www->http': '링크된 분산 문서를 교환할 클라이언트·서버 간 요청 의미론이 필요했다.',
+    'http->html': 'HTTP로 교환할 상호운용 가능한 하이퍼텍스트 문서 형식이 필요했다.',
+    'html->cgi': '정적 문서의 한계가 요청별 계산과 데이터 조회를 위한 서버 실행 모델을 요구했다.',
+    'relational-data->cgi': '동적 요청 처리와 영속 데이터 조회가 결합해 데이터 기반 웹 애플리케이션을 구성했다.',
+    'cgi->monolith': '초기 동적 웹 처리는 단일 애플리케이션 배포 단위에 요청 처리와 업무 로직을 모으는 방식을 확산시켰다.',
+    'monolith->n-tier': '단일 배포 단위 안의 책임 결합을 줄이기 위해 표현·업무·데이터 책임을 분리했다.',
+    'n-tier->microservices': '계층별 책임·경계의 언어가 독립 배포 가능한 서비스 분해를 논의할 기반을 제공했다.',
+    'monolith->microservices': '전체 배포·확장·팀 변경의 결합 문제가 독립 배포 서비스로 해결하려는 대상이 됐다.',
+    'cgi->rest': '동적 서버 엔드포인트가 늘면서 상호작용을 일관된 리소스·표현 제약으로 다룰 필요가 커졌다.',
+    'javascript->ajax': '브라우저 내 스크립트 실행이 페이지 이동 없이 요청을 만드는 클라이언트 동작의 기반이 됐다.',
+    'css->ajax': '구조·표현 분리와 부분 갱신이 결합해 더 풍부한 웹 UI를 가능하게 했다.',
+    'http->rest': 'HTTP의 리소스·메서드·캐시 의미론이 REST 제약을 설명하는 주요 기반이다.',
+    'rest->microservices': '명시적인 API 경계가 독립 배포 서비스 간 통신 계약의 기반이 됐다.',
+    'ajax->microservices': '비동기 클라이언트가 늘린 API 중심 상호작용이 서버 기능의 분리를 촉진했다.',
+    'gfs->mapreduce': '대용량 데이터를 분산 저장하는 클러스터 위에서 병렬 처리 작업을 배치할 수 있었다.',
+    'mapreduce->bigtable': '대규모 클러스터에서 데이터 처리·분할·장애 처리를 다룬 경험이 분산 저장 설계와 함께 발전했다.',
+    'paxos->bigtable': '분산 저장 시스템의 메타데이터·리더 선출 등에서 합의 문제가 설계 제약으로 등장한다.',
+    'bigtable->kafka': '수평 확장 데이터 처리 환경에서 지속 로그 기반의 고처리량 데이터 전달 요구가 커졌다.',
+    'virtualization->iaas': '물리 자원을 격리된 가상 실행 단위로 나누는 능력이 탄력적 가상 서버 제공의 기반이 됐다.',
+    'iaas->containers': 'API로 확보한 탄력적 실행 환경 위에서 애플리케이션 패키징·이식성 문제가 두드러졌다.',
+    'config-management->iac': '원하는 상태를 선언·반복 적용하는 습관이 인프라 전체를 코드로 관리하는 방식으로 확장됐다.',
+    'iac->kubernetes': '선언한 desired state를 코드로 검토·적용하는 모델이 Kubernetes 리소스 운영과 맞물린다.',
+    'containers->kubernetes': '표준화된 컨테이너 배포 단위가 대규모 배치·복구·네트워킹 조정 문제를 만들었다.',
+    'cicd->gitops': '자동 검증·전달 흐름이 Git의 선언 상태와 지속 조정을 결합하는 운영 방식으로 확장됐다.',
+    'microservices->kubernetes': '독립 배포 서비스가 늘며 서비스별 배치·복구·확장을 자동 조정할 필요가 커졌다.',
+    'kubernetes->gitops': '선언형 Kubernetes 리소스가 Git 기반 desired state와 자동 reconciliation의 적용 대상이 됐다.',
+    'kubernetes->service-mesh': '동적 서비스 집합에서 통신 정책·보안·관측을 일관되게 적용할 플랫폼 계층이 필요해졌다.',
+    'microservices->service-mesh': '서비스 간 호출이 늘며 인증·재시도·트래픽 제어를 각 애플리케이션에 중복 구현하는 한계가 생겼다.',
+    'service-mesh->observability': '서비스 간 통신 계층이 trace·metric 같은 공통 신호를 수집할 지점을 제공한다.',
+    'kubernetes->observability': '동적으로 생성·교체되는 워크로드를 운영하려면 공통 라벨과 수집 경로가 필요하다.',
+    'observability->slo': '사용자 경험을 측정할 신호가 있어야 서비스 수준 목표를 지속적으로 계산할 수 있다.',
+    'slo->error-budget': '측정 가능한 신뢰성 목표가 있어야 허용 가능한 실패량을 예산으로 계산할 수 있다.',
+    'gitops->idp': '표준화된 선언형 배포 경로가 개발자에게 self-service golden path로 제공될 수 있다.',
+    'cicd->supply-chain': '자동 빌드·전달 과정에서 산출물의 출처와 무결성을 검증할 전달 계약이 필요해졌다.',
+    'iac->policy': '코드화된 인프라 변경이 정책을 기계적으로 평가·차단할 입력을 제공한다.',
+    'idp->policy': '자가 서비스 플랫폼은 팀 자율성을 유지하면서 일관된 가드레일을 제공해야 한다.',
+    'supply-chain->tool-calling': '자동화된 실행에 신뢰·권한·출처 경계를 두는 공급망 원칙이 도구 실행의 통제에도 적용된다.',
+    'policy->tool-calling': '외부 시스템을 호출하는 에이전트에는 권한·입력·실행을 정책으로 제한할 필요가 있다.',
+    'tool-calling->agent-evals': '도구 선택과 인자 생성이 워크플로 품질을 좌우하므로 이를 포함한 평가가 필요하다.',
+    'llm-agents->tool-calling': '외부 환경에서 행동하는 에이전트는 텍스트 출력만이 아닌 구조화된 도구 실행을 필요로 한다.',
+    'observability->agent-evals': '에이전트의 실행 흔적과 지연·비용 신호가 평가·회귀 분석의 관측 데이터가 된다.'
+  };
+
+  const verifiedCausalEvidence = {
+    'tcp-ip->dns': ['causal-tcp-dns'],
+    'dns->www': ['causal-dns-www'],
+    'www->http': ['causal-www-http'],
+    'http->html': ['causal-http-html'],
+    'monolith->n-tier': ['causal-monolith-ntier'],
+    'gfs->mapreduce': ['causal-gfs-mapreduce'],
+    'virtualization->iaas': ['causal-virtualization-iaas'],
+    'containers->kubernetes': ['causal-containers-kubernetes'],
+    'cicd->gitops': ['causal-cicd-gitops'],
+    'microservices->service-mesh': ['causal-microservices-mesh'],
+    'slo->error-budget': ['causal-slo-budget']
+  };
+
+  const L = (from, to, type, core = false) => {
+    const id = `${from}->${to}`;
+    const evidenceIds = verifiedCausalEvidence[id] || [];
+    return {
+      id, from, to, type, core,
+      verification: {
+        status: evidenceIds.length ? 'verified' : 'needs-review',
+        mechanism: causalClaims[id],
+        temporalBasis: '두 기술의 대표 실용화 시점과 실제 채택 순서를 별도로 검토해야 함.',
+        evidenceIds
+      }
+    };
+  };
   const links = [
     L('packet-switching','tcp-ip','enables',true), L('tcp-ip','dns','enables',true), L('dns','www','enables',true), L('www','http','enables',true), L('http','html','enables',true), L('html','cgi','enables',true), L('relational-data','cgi','enables'), L('cgi','monolith','enables'), L('monolith','n-tier','transforms',true), L('n-tier','microservices','enables',true), L('monolith','microservices','solves'), L('cgi','rest','enables',true), L('javascript','ajax','enables',true), L('css','ajax','enables'), L('http','rest','enables'), L('rest','microservices','enables',true), L('ajax','microservices','enables'),
     L('gfs','mapreduce','enables',true), L('mapreduce','bigtable','enables',true), L('paxos','bigtable','solves'), L('bigtable','kafka','enables',true), L('virtualization','iaas','enables',true), L('iaas','containers','enables',true), L('config-management','iac','enables',true), L('iac','kubernetes','enables',true), L('containers','kubernetes','enables',true), L('cicd','gitops','transforms',true), L('microservices','kubernetes','enables'),
     L('kubernetes','gitops','enables',true), L('kubernetes','service-mesh','enables'), L('microservices','service-mesh','solves'), L('service-mesh','observability','enables'), L('kubernetes','observability','enables',true), L('observability','slo','enables',true), L('slo','error-budget','enables',true), L('gitops','idp','enables',true), L('cicd','supply-chain','transforms'), L('iac','policy','enables'), L('idp','policy','enables'), L('supply-chain','tool-calling','enables'), L('policy','tool-calling','solves'), L('tool-calling','agent-evals','enables',true), L('llm-agents','tool-calling','enables',true), L('observability','agent-evals','enables')
   ];
-  return { eras, nodes, links, references };
+  return { eras, nodes, links, references, causalReferences };
 })();
