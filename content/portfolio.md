@@ -47,8 +47,8 @@ GitOps controller와 애플리케이션 리소스의 관리 경계를 구분한�
 ApplicationSet과 App-of-Apps를 함께 쓸 때 Git 변경이 어떤 controller를 거쳐 배포 리소스까지 이어지는지 정리했다. 특히 생성, 갱신, drift 복구, 삭제가 같은 설정 하나로 결정되지 않는 이유를 다뤘다.
 
 - **문제**: Git 변경 뒤 새 서비스 생성·기존 서비스 갱신·삭제 범위의 확인 지점이 섞임
-- **판단**: generated `Application`을 조정하는 주체와 workload를 sync·삭제하는 주체를 분리
-- **결과**: controller 경계, prune, finalizer, 리소스 보존 정책을 기준으로 운영 절차를 설명할 수 있게 됨
+- **판단**: ApplicationSet의 generated `Application` 관리와 application controller의 workload sync를 분리하고, `prune`·Application 삭제·리소스 보존 정책을 별도 판단
+- **결과**: 생성·갱신·삭제마다 확인할 controller와 정책을 좁혔으며, 삭제 전에는 비운영 환경 검증과 변경 리뷰가 필요하다는 기준을 마련
 
 ## 더 보기
 

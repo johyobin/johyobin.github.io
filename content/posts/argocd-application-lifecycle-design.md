@@ -16,6 +16,14 @@ ApplicationSet이 새 `Application`을 만들고, 그 `Application`이 Deploymen
 
 > **Git 변경이 곧바로 배포 리소스 변경을 뜻하지는 않는다. 어느 controller가 무엇을 관리하는지 나눠 봐야 애플리케이션 생명주기를 예측할 수 있다.**
 
+## 대표 사례 요약
+
+- **문제**: 새 서비스 경로 추가, 이미지 tag 갱신, Git 경로 삭제가 각각 어느 `Application`과 배포 리소스에 영향을 주는지 한 흐름으로 설명하기 어려웠다.
+- **확인 범위**: App-of-Apps parent, ApplicationSet, generated `Application`, 그리고 그 `Application`이 sync하는 Kubernetes 리소스까지의 관리 경계를 정리했다. 애플리케이션 코드나 개별 workload의 구현을 바꾼 사례는 아니다.
+- **판단**: ApplicationSet은 generated `Application`의 집합을, application controller는 각 `Application`의 배포 리소스를 다룬다고 분리했다. 삭제도 `prune`, generated `Application` 삭제, `preserveResourcesOnDeletion`, parent `Application` 삭제를 같은 설정으로 보지 않았다.
+- **검증 기준**: 새 서비스는 generated `Application`의 이름·source path·namespace부터, 기존 서비스 갱신은 기존 `Application`의 렌더링 결과·sync 상태부터 확인한다. 삭제 전에는 사라지는 계층과 보존할 리소스를 먼저 대조한다.
+- **결과와 한계**: 생성·갱신·drift·삭제마다 확인할 controller와 설정을 좁히는 기준을 만들었다. 다만 실제 운영 리소스를 의도적으로 삭제해 전파를 시험한 기록은 아니므로, 삭제 정책은 비운영 환경 검증과 변경 리뷰를 거쳐 적용해야 한다.
+
 ## 이 글에서 따라갈 구성
 
 한 프로젝트의 GitOps 저장소를 익명화해 단순화하면 다음과 같은 구조였다.
