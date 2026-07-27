@@ -75,5 +75,7 @@ Target Tracking(목표 추적 방식 오토스케일링)의 스케일인 로직�
 
 장애 세 건을 따로따로 대응하다가, 나중에야 하나의 잘못된 가정이었다는 걸 알았다. 다음엔 증상이 아니라 가정부터 의심하는 습관을 들이려 한다.
 
+> 관련 판단 연습: [HPA가 잘못된 지표를 따른다](/labs/hpa-wrong-signal/)는 메모리 사용률 대신 실제 수요 신호를 비교하는 별도 시나리오다. 이 글의 ECS 장애를 재현한 사례는 아니다.
+
 [^1]: [Amazon ECS - Optimizing Amazon ECS service auto scaling](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/capacity-autoscaling-best-practice.html) — "The Java-based server" 섹션
 [^2]: [Amazon ECS - Use strategies to define Amazon ECS task placement](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html) — `binpack`은 사용하지 않는 CPU 또는 메모리가 가장 적게 남도록 태스크를 배치한다.
