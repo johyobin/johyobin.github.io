@@ -155,7 +155,7 @@ sequenceDiagram
 - 롤백은 이전 SHA를 Git에 다시 선언하는 절차여야 한다.
 - GitOps는 자동 배포 도구가 아니라, **무슨 버전을 왜 배포하는지 남기는 운영 기록**이기도 하다.
 
-> 관련 판단 연습: [Argo CD drift와 sync 실패](/labs/argo-cd-drift-sync/)에서 Git desired state, Argo CD sync 이력, live workload를 대조하는 순서를 점검할 수 있다.
+> 관련 사례 확인: [Argo CD drift와 sync 실패](/labs/argo-cd-drift-sync/)에서 Git desired state, Argo CD sync 이력, live workload를 대조하는 순서를 확인할 수 있다.
 
 [^1]: [Amazon ECR 태그 불변성](https://docs.aws.amazon.com/ko_kr/AmazonECR/latest/userguide/image-tag-mutability.html)
 

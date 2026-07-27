@@ -185,4 +185,4 @@ ApplicationSet과 App-of-Apps를 함께 쓰면 Git 변경 하나가 여러 계�
 
 이 경계를 먼저 그려 두면 새 서비스가 생성되지 않거나, 이미지가 갱신되지 않거나, 수동 변경이 되돌아가거나, 디렉터리 삭제 범위가 불분명할 때도 확인할 controller와 설정을 빠르게 좁힐 수 있다. GitOps의 자동화는 Git 변경 그 자체가 아니라, 각 계층의 controller가 맡을 관리 범위를 명확히 정할 때 예측 가능해진다.
 
-> 관련 판단 연습: [Argo CD drift와 sync 실패](/labs/argo-cd-drift-sync/)에서 Git desired state, sync 오류, live workload를 비교한 뒤 안전한 복구 범위를 선택해 볼 수 있다.
+> 관련 사례 확인: [Argo CD drift와 sync 실패](/labs/argo-cd-drift-sync/)에서 Git desired state, sync 오류, live workload를 비교해 안전한 복구 범위를 확인할 수 있다.
