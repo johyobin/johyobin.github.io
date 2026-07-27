@@ -192,5 +192,99 @@ window.incidentScenarios = {
         }
       }
     ]
+  },
+  'hpa-wrong-signal': {
+    prototypeLabel: '프로토타입',
+    prototypeNotice: '한 번의 장애 상황에서 관측·가설·대응 흐름이 자연스러운지 확인하기 위한 브라우저 내 시뮬레이터입니다. 실제 서비스나 클라우드 리소스에는 연결되지 않습니다.',
+    intro: '<code>catalog-api</code>의 요청 지연이 증가했지만 HPA는 메모리 사용률만 보고 있습니다. 실제 수요와 비례하는 신호를 비교해, 영향과 낭비를 함께 줄일 대응을 선택해 보세요.',
+    incident: {
+      code: 'INC-2026-0727 · SEV-2',
+      title: 'catalog-api HPA 스케일링 신호 불일치',
+      subtitle: '15:04 이후 요청 대기열과 지연이 늘었지만, HPA replica 수는 3개에 머물러 있습니다.'
+    },
+    steps: [
+      { id: 'evidence', label: '신호 확인', note: '0/3개 확인' },
+      { id: 'decision', label: '대응 선택', note: '근거를 바탕으로 선택' },
+      { id: 'debrief', label: '판단 결과', note: '대응의 영향을 확인' }
+    ],
+    copy: {
+      initialInstruction: '1단계: HPA 지표와 요청률·CPU·동시성을 비교해 실제 수요 신호를 찾으세요.',
+      initialDecisionGuidance: 'replica 수나 목표값부터 바꾸기 전에, 어떤 신호가 포화를 설명하는지 확인하세요.',
+      decisionInstruction: (checked, total) => `2단계: 신호 ${checked}/${total}개를 확인했습니다. 이제 수요에 맞는 스케일링 대응을 선택하세요.`,
+      decisionGuidance: (checked, total) => `확인한 신호 ${checked}/${total}개. 대응을 선택하면 사용자 영향과 운영 낭비를 비교할 수 있습니다.`,
+      debriefInstruction: '3단계: 판단 결과를 확인하세요. 시나리오를 다시 시작해 세 대응의 시간·영향·비용을 비교할 수 있습니다.',
+      afterDecisionGuidance: '대응을 선택했습니다. 아래 결과에서 HPA 신호와 실제 수요의 차이를 확인하세요.',
+      initialEvidence: '아직 확인한 신호가 없습니다. 메모리 사용률만 보지 말고 요청률, CPU, 동시성을 비교해 보세요.'
+    },
+    initial: {
+      status: { label: '조사 필요', className: 'is-critical' },
+      metrics: [
+        { id: 'memory', label: 'HPA 메모리 사용률', value: '42%', note: '목표 70% · 3 replicas 유지' },
+        { id: 'request-rate', label: '요청률', value: '1,860 rpm', note: '평소 720 rpm' },
+        { id: 'cpu', label: 'CPU 사용률', value: '83%', note: '처리 포화 신호' },
+        { id: 'concurrency', label: 'in-flight 요청', value: '74/pod', note: '안정 범위 25/pod' }
+      ],
+      outcomes: [
+        { id: 'elapsed', label: '경과 시간', value: '—', note: '대응 후 결과' },
+        { id: 'outcome-impact', label: '최종 영향 요청', value: '—', note: '대응 후 누적' },
+        { id: 'cost', label: '운영 비용·낭비', value: '—', note: '대응에 따른 추가 부담' }
+      ],
+      timeline: '15:04 · 캠페인 유입 시작, 요청률 상승에도 HPA는 메모리 42%만 평가'
+    },
+    evidence: [
+      { id: 'hpa', label: 'HPA 설정·메모리 확인', contentHtml: '<strong>HPA 상태</strong><br><code>averageUtilization: memory 70%</code> · 현재 42% · <code>3 replicas</code><br>응답 본문은 작고 캐시가 자주 비워져 메모리 사용률은 요청량과 비례하지 않습니다. HPA가 확장 조건을 충족하지 못합니다.' },
+      { id: 'demand', label: '요청률·CPU 확인', contentHtml: '<strong>수요와 처리량</strong><br>요청률은 <code>720 → 1,860 rpm</code>, CPU는 <code>38% → 83%</code>로 함께 증가했습니다. pod당 처리량은 약 620 rpm 부근에서 포화되어, CPU와 요청률은 실제 수요를 설명합니다.' },
+      { id: 'concurrency', label: '동시성·대기열 확인', contentHtml: '<strong>포화 지표</strong><br><code>in_flight_requests=74/pod</code>, 대기열 318건, p95 3.6s입니다. 안정 범위는 pod당 동시성 25 이하입니다. 메모리는 42%로 평평하지만 요청 대기는 계속 쌓입니다.' }
+    ],
+    decisions: [
+      {
+        id: 'scale-out', label: 'replica를 8개로 즉시 고정 확장', hint: '현재 증상은 완화하지만 자동 기준은 그대로',
+        result: {
+          status: { label: '부분 복구', className: 'is-critical' },
+          metrics: [
+            { id: 'memory', value: '31%', note: '낮아져도 HPA 기준은 그대로' }, { id: 'request-rate', value: '1,860 rpm', note: '수요 신호는 미연결' }, { id: 'cpu', value: '46%', note: '8개로 분산' }, { id: 'concurrency', value: '28/pod', note: '다음 변동에 다시 포화 가능' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '17분', note: '15:04 → 15:21 부분 안정화' }, { id: 'outcome-impact', value: '2,184건', note: '수동 판단·확장 전 누적' }, { id: 'cost', value: '8 replicas 고정', note: '저부하에도 5개 과잉 운영 · 신호 미수정' }
+          ],
+          timeline: '15:21 · 수동 8 replicas 확장, 지연 완화되나 HPA는 메모리만 평가',
+          debrief: { default: { success: false, title: '확장은 증상을 덮었지만 기준은 틀린 채입니다.', body: '8개 pod로 현재 대기열은 줄었지만, 다음 트래픽 변동에도 운영자가 다시 개입해야 합니다. 저부하에서 5개 pod가 과잉으로 남아 비용을 낭비합니다. HPA 지표가 실제 수요를 따르도록 바꿔야 합니다.' } }
+        }
+      },
+      {
+        id: 'tune-memory', label: '메모리 목표값을 40%로 낮춤', hint: '같은 비례하지 않는 지표를 더 민감하게 만듦',
+        result: {
+          status: { label: '불안정', className: 'is-critical' },
+          metrics: [
+            { id: 'memory', value: '39%', note: '캐시 변동에 따라 6→3 replicas' }, { id: 'request-rate', value: '1,860 rpm', note: '수요 변화와 무관' }, { id: 'cpu', value: '71%', note: '축소 뒤 다시 상승' }, { id: 'concurrency', value: '49/pod', note: '대기열 재증가' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '24분', note: '15:04 → 15:28 불안정 지속' }, { id: 'outcome-impact', value: '3,416건', note: 'flapping 동안 추가 영향' }, { id: 'cost', value: '6→3 replicas 반복', note: '스케일 변동 · 캐시 재가열 · 운영자 대응 낭비' }
+          ],
+          timeline: '15:28 · 메모리 캐시 변동으로 HPA 반복 확장·축소, 대기열 재증가',
+          debrief: { default: { success: false, title: '목표값을 낮춰도 잘못된 신호는 수요를 설명하지 못합니다.', body: '40%라는 값은 메모리를 더 민감하게 할 뿐, 요청률과 관계없는 캐시 변동에 반응합니다. 그 결과 replica가 반복 변동하고 영향 요청은 3,416건으로 늘었습니다. 임계값보다 지표의 인과성을 먼저 검증하세요.' } }
+        }
+      },
+      {
+        id: 'change-signal', label: '요청 동시성 기준으로 HPA 신호 변경', hint: '실제 처리 수요에 비례하는 지표를 사용', primary: true,
+        result: {
+          status: { label: '복구됨', className: 'is-healthy' },
+          metrics: [
+            { id: 'memory', value: '36%', note: '참고 지표로 유지' }, { id: 'request-rate', value: '1,860 rpm', note: '수요와 함께 관측' }, { id: 'cpu', value: '54%', note: '6 replicas로 분산' }, { id: 'concurrency', value: '23/pod', note: '목표 25 이하로 정상화' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '11분', note: '15:04 → 15:15 복구' }, { id: 'outcome-impact', value: '1,062건', note: '복구 전 최종 누적' }, { id: 'cost', value: '6 replicas 자동 조정', note: '수요 하락 시 축소 · 불필요한 pod 없음' }
+          ],
+          timeline: '15:15 · in-flight 요청 목표 25/pod로 HPA 변경, 6 replicas에서 대기열 정상화',
+          debrief: {
+            default: { success: true, title: '올바른 방향이지만, 수요 근거를 확인하세요.', body: '동시성 기준으로 바꿔 11분 안에 대기열을 정상화했습니다. 다음에는 요청률·CPU·동시성의 상관관계와 목표값 25/pod의 용량 검증을 기록해, 다음 트래픽에서도 안전하게 조정하세요.' },
+            whenEvidence: {
+              required: ['demand', 'concurrency'],
+              complete: { success: true, title: '실제 수요를 근거로 스케일링 신호를 바로잡았습니다.', body: '요청률·CPU 상승과 pod당 동시성 74를 함께 확인해, 메모리가 아닌 처리 수요가 병목임을 입증했습니다. 동시성 목표 25/pod로 HPA를 바꿔 11분 안에 복구했고, 수요가 내려가면 자동 축소해 과잉 pod 비용도 피합니다. 후속으로 목표 동시성의 부하 시험, 최대 replica 여유, 요청률·대기열 알림을 점검하세요.' }
+            }
+          }
+        }
+      }
+    ]
   }
 };
