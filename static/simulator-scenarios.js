@@ -286,5 +286,99 @@ window.incidentScenarios = {
         }
       }
     ]
+  },
+  'argo-cd-drift-sync': {
+    prototypeLabel: '프로토타입',
+    prototypeNotice: '한 번의 장애 상황에서 관측·가설·대응 흐름이 자연스러운지 확인하기 위한 브라우저 내 시뮬레이터입니다. 실제 서비스나 클라우드 리소스에는 연결되지 않습니다.',
+    intro: '<code>orders-api</code>의 선언 상태는 정상 버전을 가리키지만, 클러스터에는 사람이 수정한 live state와 실패한 sync가 남아 있습니다. Argo CD 상태·sync 이력·workload 상태를 비교하고, 복구 범위를 판단해 보세요.',
+    incident: {
+      code: 'INC-2026-0727 · SEV-2',
+      title: 'orders-api Argo CD drift와 sync 실패',
+      subtitle: '11:06부터 일부 주문 요청이 5xx입니다. Application은 OutOfSync이고, live Deployment는 desired state와 다릅니다.'
+    },
+    steps: [
+      { id: 'evidence', label: '상태 비교', note: '0/3개 확인' },
+      { id: 'decision', label: '복구 선택', note: '근거를 바탕으로 선택' },
+      { id: 'debrief', label: '판단 결과', note: '대응의 영향을 확인' }
+    ],
+    copy: {
+      initialInstruction: '1단계: Git의 desired state, Argo CD sync 이력, live workload 상태를 서로 비교하세요.',
+      initialDecisionGuidance: 'OutOfSync만 보고 즉시 강제 sync하지 말고, 어떤 변경이 왜 실패했는지 먼저 좁히세요.',
+      decisionInstruction: (checked, total) => `2단계: 근거 ${checked}/${total}개를 확인했습니다. 복구 범위와 sync 방법을 선택하세요.`,
+      decisionGuidance: (checked, total) => `확인한 근거 ${checked}/${total}개. 대응을 선택하면 시간·영향·운영 낭비를 비교할 수 있습니다.`,
+      debriefInstruction: '3단계: 판단 결과를 확인하세요. 다시 시작해 강제 sync, live 수정, 안전한 복구의 차이를 비교할 수 있습니다.',
+      afterDecisionGuidance: '대응을 선택했습니다. 아래 결과에서 선언 상태와 live state를 어떻게 다뤘는지 확인하세요.',
+      initialEvidence: '아직 확인한 근거가 없습니다. Application 상태 하나로 원인을 단정하지 말고 desired·sync·workload를 비교하세요.'
+    },
+    initial: {
+      status: { label: '조사 필요', className: 'is-critical' },
+      metrics: [
+        { id: 'application', label: 'Argo CD Application', value: 'OutOfSync', note: 'Sync 실패 후 drift 감지' },
+        { id: 'sync', label: '마지막 sync', value: 'Failed', note: '11:04 · PreSync hook 실패' },
+        { id: 'workload', label: 'orders-api ready', value: '2/4 pods', note: 'live replicas=2 · desired=4' },
+        { id: 'errors', label: '주문 5xx', value: '8.7%', note: 'SLO 1% 초과' }
+      ],
+      outcomes: [
+        { id: 'elapsed', label: '경과 시간', value: '—', note: '대응 후 결과' },
+        { id: 'outcome-impact', label: '최종 영향 요청', value: '—', note: '대응 후 누적' },
+        { id: 'cost', label: '운영 비용·낭비', value: '—', note: '대응에 따른 추가 부담' }
+      ],
+      timeline: '11:04 · Git revision 4f91c2a sync 시작, PreSync migration hook 실패 후 live Deployment가 2 replicas로 남음'
+    },
+    evidence: [
+      { id: 'desired', label: 'Git desired state 확인', contentHtml: '<strong>선언한 상태</strong><br><code>main@4f91c2a</code>의 <code>orders-api</code> Deployment는 <code>replicas: 4</code>, image <code>registry/orders-api@sha256:8ad…</code>를 선언합니다.<br>같은 revision의 migration Job은 <code>DATABASE_URL</code> Secret 참조를 새 이름 <code>orders-db-v2</code>로 바꿨습니다.' },
+      { id: 'sync-history', label: 'Argo CD sync 이력·오류 확인', contentHtml: '<strong>Application sync 이력</strong><br><code>11:04 Sync Failed</code> · PreSync <code>migrate-orders-4f91c2a</code> Job: <code>secret &quot;orders-db-v2&quot; not found</code><br>자동 sync는 실패한 hook 뒤 중단됐고 Application은 <code>OutOfSync / Degraded</code>입니다. 실패 revision과 오류가 남아 있습니다.' },
+      { id: 'live', label: 'Kubernetes live workload 확인', contentHtml: '<strong>클러스터 실제 상태</strong><br>live Deployment는 image <code>sha256:71e…</code>, <code>replicas: 2</code>입니다. audit log에는 <code>10:58 kubectl scale deployment/orders-api --replicas=2</code>가 있습니다.<br>2/4 pod만 Ready이며 CPU 91%, 주문 5xx 8.7%입니다. 이 live 수정은 Git에 없습니다.' }
+    ],
+    decisions: [
+      {
+        id: 'force-sync', label: '원인 확인 없이 force sync 실행', hint: '실패한 hook과 drift를 한 번에 덮으려 함',
+        result: {
+          status: { label: '미복구', className: 'is-critical' },
+          metrics: [
+            { id: 'application', value: 'OutOfSync', note: 'hook 실패로 sync 중단' }, { id: 'sync', value: 'Failed', note: '누락 Secret 오류 반복' }, { id: 'workload', value: '2/4 pods', note: 'live scale과 구버전 유지' }, { id: 'errors', value: '10.2%', note: '재시도 동안 오류 증가' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '21분', note: '11:04 → 11:25 미복구' }, { id: 'outcome-impact', value: '2,746건', note: '실패한 재시도 중 영향 누적' }, { id: 'cost', value: 'force sync 2회', note: '실패 반복 · 운영자 조사 지연' }
+          ],
+          timeline: '11:25 · force sync 재시도도 누락 Secret에서 실패, desired와 live 차이 지속',
+          debrief: { default: { success: false, title: '강제 sync는 실패 원인을 제거하지 못했습니다.', body: 'PreSync migration이 존재하지 않는 Secret을 참조하므로 force sync를 반복해도 적용이 중단됩니다. live 2 replicas도 그대로여서 21분 동안 영향 요청이 2,746건으로 늘었습니다. 먼저 sync 오류와 적용 범위를 확인하세요.' } }
+        }
+      },
+      {
+        id: 'live-edit', label: '클러스터에서 live 상태만 직접 수정', hint: '즉시 4 replicas로 늘리고 Job을 수동 우회',
+        result: {
+          status: { label: '일시 안정', className: 'is-critical' },
+          metrics: [
+            { id: 'application', value: 'OutOfSync', note: 'Git과 live 불일치 확대' }, { id: 'sync', value: 'Failed', note: '실패 revision 기록은 그대로' }, { id: 'workload', value: '4/4 pods', note: '수동 scale · 다음 sync에 덮일 수 있음' }, { id: 'errors', value: '0.9%', note: '용량 확장으로 일시 완화' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '16분', note: '11:04 → 11:20 일시 안정' }, { id: 'outcome-impact', value: '1,884건', note: '수동 조치 전 누적' }, { id: 'cost', value: '숨은 drift 2건', note: '다음 sync 재발 위험 · 인수인계 비용' }
+          ],
+          timeline: '11:20 · live Deployment 수동 scale, 오류율은 낮아졌지만 Application OutOfSync 유지',
+          debrief: { default: { success: false, title: 'live 수정은 현재 증상만 가렸습니다.', body: '4 replicas로 5xx는 낮아졌지만 Git에는 2 replicas 변경도 Secret 누락도 기록되지 않습니다. 다음 Argo CD sync가 수동 상태를 덮거나 다시 실패할 수 있어 drift가 더 깊어졌습니다. 복구는 선언 상태와 함께 남겨야 합니다.' } }
+        }
+      },
+      {
+        id: 'safe-recovery', label: 'Secret 참조를 검증·수정 후 안전하게 sync', hint: '실패 원인을 Git에서 고치고 diff 확인 뒤 적용', primary: true,
+        result: {
+          status: { label: '복구됨', className: 'is-healthy' },
+          metrics: [
+            { id: 'application', value: 'Synced · Healthy', note: 'Git revision 6be2d10 적용' }, { id: 'sync', value: 'Succeeded', note: '11:16 · migration hook 완료' }, { id: 'workload', value: '4/4 pods', note: 'desired image·replicas 일치' }, { id: 'errors', value: '0.4%', note: 'SLO 범위 내' }
+          ],
+          outcomes: [
+            { id: 'elapsed', value: '12분', note: '11:04 → 11:16 복구' }, { id: 'outcome-impact', value: '1,126건', note: '복구 전 최종 누적' }, { id: 'cost', value: '추가 인프라 낭비 없음', note: '선언 복구 · drift 재발 방지' }
+          ],
+          timeline: '11:16 · Secret 참조를 기존 이름으로 수정한 revision 6be2d10 sync 성공, desired와 live 일치',
+          debrief: {
+            default: { success: true, title: '안전한 복구 방향입니다. 근거도 남기세요.', body: '실패 원인을 Git에서 수정하고 sync해 desired와 live를 다시 맞췄습니다. 다음에는 sync 오류, 실제 workload, Git diff를 함께 남겨 어떤 drift를 복구했는지 추적 가능하게 하세요.' },
+            whenEvidence: {
+              required: ['desired', 'sync-history', 'live'],
+              complete: { success: true, title: '세 경계를 비교한 근거 있는 GitOps 복구입니다.', body: 'Git의 4 replicas·새 Secret 참조, Argo CD의 PreSync Secret 오류, live의 수동 2 replicas·구버전을 함께 확인했습니다. 원인은 Git의 잘못된 Secret 참조와 Git 밖 live 수정이 겹친 것이었습니다. Secret 참조를 Git에서 바로잡고 diff를 검토한 뒤 sync해 12분 만에 복구했고, 1,126건에서 영향과 재발성 drift를 멈췄습니다. 후속으로 Secret 이름 검증, sync hook 실패 알림, kubectl 직접 변경 감사를 점검하세요.' }
+            }
+          }
+        }
+      }
+    ]
   }
 };
