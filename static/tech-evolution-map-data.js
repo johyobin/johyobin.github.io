@@ -248,6 +248,13 @@ window.techEvolutionMap = (() => {
       title: 'SLO·오류 예산',
       description: '사용자 관점 신뢰성 목표와 허용 실패량으로 안정성·변경 속도를 함께 판단하는 방식을 읽는다.',
       url: '/tech-evolution-map/extensions/slo-and-error-budget/'
+    },
+    {
+      id: 'workload-execution-scaling',
+      mainNodeId: 'kubernetes',
+      title: '워크로드 실행·확장',
+      description: 'controller·resource request·metric이 장애와 부하 변화 속의 실행 수를 어떻게 조정하는지 읽는다.',
+      url: '/tech-evolution-map/extensions/workload-execution-scaling/'
     }
   ];
 
