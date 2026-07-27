@@ -171,11 +171,10 @@
 .tem-detail h2 small { display: block; margin-top: .25rem; color: var(--tem-muted); font-size: .75rem; font-weight: 500; }
 .tem-story { display: grid; gap: .7rem; margin: 0; }
 .tem-story div { padding-bottom: .7rem; border-bottom: 1px solid var(--tem-line); }
-.tem-story dt, .tem-ops strong { color: var(--tem-accent); font-size: .74rem; }
-.tem-story dd, .tem-ops p { margin: .22rem 0 0; color: rgb(var(--color-neutral-200)); font-size: .86rem; line-height: 1.55; }
-.tem-ops, .tem-connections { margin-top: 1rem; }
-.tem-ops h3, .tem-connections h3, .tem-extensions h3 { margin: 0 0 .65rem; font-size: .92rem; }
-.tem-ops > div { margin-top: .6rem; }
+.tem-story dt { color: var(--tem-accent); font-size: .74rem; }
+.tem-story dd { margin: .22rem 0 0; color: rgb(var(--color-neutral-200)); font-size: .86rem; line-height: 1.55; }
+.tem-connections { margin-top: 1rem; }
+.tem-connections h3, .tem-extensions h3 { margin: 0 0 .65rem; font-size: .92rem; }
 .tem-extensions { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--tem-line); }
 .tem-extensions > p { margin: -.3rem 0 .65rem; color: var(--tem-muted); font-size: .75rem; line-height: 1.45; }
 .tem-extensions ul, .tem-next-extensions ul { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
