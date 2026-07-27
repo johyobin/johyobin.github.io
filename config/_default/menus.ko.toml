@@ -4,8 +4,8 @@
   weight = 10
 
 [[main]]
-  name = "시뮬레이터"
-  pageRef = "simulator"
+  name = "Incident Labs"
+  pageRef = "labs"
   weight = 15
 
 [[main]]
