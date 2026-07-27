@@ -4,25 +4,23 @@ draft = false
 title = 'Git에서 Argo CD가 참조하는 매니페스트 디렉터리를 삭제하면 어디까지 삭제되는가'
 +++
 
-# Git에서 Argo CD가 참조하는 매니페스트 디렉터리를 삭제하면 어디까지 삭제되는가
-
 운영 중인 서비스의 매니페스트 디렉터리 하나를 Git에서 삭제했다. 그러면 Argo CD는 Application만 정리할까, 아니면 해당 Application의 관리 대상 리소스(workload)까지 정리할까?
 
 결론부터 말하면, 삭제 범위는 `prune: true` 하나로 결정되지 않는다. 어떤 controller가 어떤 리소스를 조정하는지, generated `Application`에 finalizer가 있는지, workload를 보존하는 정책이 켜져 있는지를 함께 봐야 한다. 이번 글에서는 ApplicationSet과 App-of-Apps를 같은 “상위 관리 구조”로 뭉뚱그리지 않고, Git 변경이 각 계층을 어떻게 통과하는지 따라가 본다.
 
 여기서 매니페스트 디렉터리는 Git 저장소 안에서 Argo CD `Application`의 `spec.source.path`가 가리키는 디렉터리를 뜻한다.
 
-## 먼저 구성요소부터 짚고 간다
+## 대표 글과 이 글의 역할
 
-Argo CD에서 `Application`은 Git의 특정 경로를 대상 클러스터에 배포하고 그 상태를 추적하는 기본 단위다. 이 글에서 말하는 workload는 `Application`이 source 경로에서 읽어 배포하는 Kubernetes 리소스 집합을 뜻한다.
+[대표 글](/posts/argocd-application-lifecycle-design/)은 새 서비스 생성, 이미지 갱신, drift 복구, 삭제를 통틀어 어떤 controller가 무엇을 관리하는지 설명한다. 이 글은 그중 **삭제**만 더 깊게 다룬다. `prune`, `Application` 삭제, finalizer, `preserveResourcesOnDeletion`, 삭제 순서와 승인 절차가 각각 무엇을 결정하는지 확인할 때 참고하는 글이다.
 
-`ApplicationSet`은 여러 경로, 클러스터, 파일을 generator로 읽어 여러 `Application`을 만들어 주는 상위 리소스다. 예를 들어 서비스별 overlay 디렉터리를 스캔해 서비스마다 하나의 generated `Application`을 만들 수 있다.
+삭제를 읽는 데 필요한 전제는 세 가지다.
 
-`App-of-Apps`는 별도 리소스 종류가 아니라 패턴이다. parent `Application`의 source에 child `Application` 매니페스트를 두고, parent가 그 child들을 관리한다. 따라서 ApplicationSet은 `Application`을 생성하는 controller 중심의 구조이고, App-of-Apps는 parent `Application`이 child `Application`을 관리하는 구조라고 보면 된다.
+- ApplicationSet은 generator 결과에 맞춰 generated `Application`을 조정한다.
+- App-of-Apps에서는 parent `Application`이 child `Application`을 조정한다.
+- 각 `Application`의 workload는 Argo CD application controller가 sync·삭제한다.
 
-## 삭제 흐름은 계층별로 따라간다
-
-복구한 매니페스트를 하나씩 따라가 보니, 삭제 결과를 이해하려면 리소스 이름보다 controller별 관리 범위를 먼저 봐야 했다.
+삭제 결과를 이해하려면 리소스 이름보다 이 관리 경계를 먼저 봐야 한다.
 
 ```text
 Git 경로 변경
@@ -116,28 +114,19 @@ parent source에 새 child 매니페스트를 추가하면 parent가 child `Appl
 4. 삭제 순서와 승인 절차를 정한다.
 5. 비연쇄 삭제 후 남은 리소스는 orphaned resource monitoring으로 관찰한다.[^8]
 
-## 이름을 고치는 것만으로는 충분하지 않았다
+## 삭제 전 확인 순서
 
-앞선 글에서는 `path.basename`이 환경 이름만 반환하면서 Application 이름이 충돌하는 문제를 다뤘다. 이번에 이어서 확인한 것은 이름이 단순한 화면 표시값이 아니라 운영 식별자라는 점이다.
+1. Git에서 사라지는 대상이 workload 매니페스트인지, 서비스 디렉터리인지, child `Application`인지 확인한다.
+2. 그 계층을 삭제할 controller와 `applicationsSync` 또는 parent `Application`의 prune 정책을 확인한다.
+3. 삭제되는 `Application`에 finalizer가 있는지와 `preserveResourcesOnDeletion` 값을 확인한다.
+4. workload를 지우는 것이 맞다면 `PruneLast`와 `Prune=confirm`으로 순서·승인 조건을 정한다.
+5. workload를 남긴다면 orphaned resource monitoring으로 남은 리소스를 관찰한다.
 
-Application 이름이 유일하지 않으면 생성과 조회가 꼬인다. 반대로 삭제 경계를 정의하지 않으면 Application 이름을 올바르게 고쳐도 디렉터리 삭제가 어느 범위까지 전파되는지 설명할 수 없다. 결국 GitOps 설계에서 함께 정해야 하는 것은 두 가지다.
-
-- **식별자**: 이 경로가 어떤 Application을 의미하는가
-- **생명주기**: 그 Application이 사라질 때 무엇을 함께 정리하거나 남길 것인가
-
-ApplicationSet과 App-of-Apps를 선택하는 문제도 같은 관점에서 봐야 한다. 둘 다 Application을 생성할 수 있지만, generated Application을 누가 조정하는지와 workload 삭제가 어떤 finalizer를 통과하는지는 다르다. 설정을 복사하는 것보다 이 경계를 먼저 문서화하는 편이 운영 중의 “왜 이것까지 지워졌지?”를 줄여준다.
-
-## 정리
-
-- Git 디렉터리 삭제는 먼저 generator의 desired Application 집합을 바꾼다.
-- ApplicationSet controller는 generated `Application`을 조정하고, workload는 Argo CD application controller가 조정한다.
-- generated/child `Application` 삭제와 child Application 내부의 automated prune은 별도 경로다.
-- `preserveResourcesOnDeletion`, finalizer, `PruneLast`, `Prune=confirm`은 각각 보존·전파·순서·승인을 담당한다.
-- GitOps의 핵심은 “무엇을 자동화할까”보다 “각 계층을 어느 controller가 관리하고 생명주기 경계를 어디에 둘까”를 먼저 정하는 데 있다.
+이 체크 순서는 대표 글의 controller 경계를 실제 삭제 판단으로 옮긴 것이다. 생성·갱신·drift까지 포함한 전체 흐름은 [Argo CD GitOps에서 애플리케이션 생명주기를 설계하는 법](/posts/argocd-application-lifecycle-design/)에서 이어서 볼 수 있다.
 
 ## 출처
 
-[^1]: [How ApplicationSet controller interacts with Argo CD](https://argo-cd.readthedocs.io/en/release-2.13/operator-manual/applicationset/Argo-CD-Integration/)
+[^1]: [How ApplicationSet controller interacts with Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Argo-CD-Integration/)
 [^2]: [Git Generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Git/)
 [^3]: [Controlling Resource Modification](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/)
 [^4]: [Application Pruning & Resource Deletion](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Application-Deletion/)
