@@ -101,16 +101,38 @@ template:
 - 앱·환경 디렉토리 이름은 Kubernetes 이름 제약을 만족해야 한다.
 - 경로 깊이를 바꾸면 템플릿 인덱스와 Application 이름이 함께 바뀌는지 리뷰한다.
 
-## 다음부터는 생성 결과를 먼저 검증한다
+## 재발 방지는 PR에서 경로와 이름을 같이 검증하는 일이다
 
-이번 문제는 두 번째 앱을 추가한 뒤 ArgoCD 화면에서 발견했다. 다음부터는 PR 단계에서 ApplicationSet이 렌더링할 결과를 먼저 확인하는 검증을 넣기로 했다.
+이번 문제는 두 번째 앱을 추가한 뒤 ArgoCD 화면에서 발견했다. 당시 이 검증을 CI로 구현했다는 기록은 남아 있지 않다. 그래서 아래는 이 경로 계약을 다시 쓴다면 PR에 넣을 **재발 방지 규칙**이다. 운영에 이미 적용된 통제로 포장하면 안 된다.
 
-- 변경된 경로마다 예상 Application 이름이 유일한지 검사한다.
-- ApplicationSet 렌더링 결과를 CLI 또는 CI 검증으로 확인해 생성 목록을 확인한다.
-- 경로 depth를 바꾸는 변경에는 별도 리뷰를 요구한다.
-- Go Template으로 옮길 때는 `missingkey=error`를 켜서 변수 오타를 조기에 실패시킨다.
+핵심은 ApplicationSet YAML만 lint하는 게 아니라, Git에 실제로 있는 경로를 전부 읽어 **경로 → 생성될 Application 이름** 목록을 만드는 것이다. Git 디렉터리 제너레이터는 wildcard에 맞은 디렉터리마다 경로 파라미터를 만들므로, CI도 같은 입력 집합을 검사해야 한다.[^1]
 
-이렇게 하면 “디렉토리는 매칭됐는데 Application이 왜 하나지?”라는 문제를 배포 후 화면이 아니라 변경 검증 단계에서 잡을 수 있다.
+```text
+입력 경로: manifests/applications/<app>/overlays/<environment>
+이름 규칙: <app>-<environment>
+
+manifests/applications/app-a/overlays/prd  → app-a-prd
+manifests/applications/app-b/overlays/prd  → app-b-prd
+```
+
+PR CI는 아래 순서로 실패시키면 된다.
+
+1. `manifests/applications/*/overlays/*`에 맞는 디렉터리를 저장소 전체에서 수집한다. 변경 파일만 보면 기존 경로와의 충돌을 놓칠 수 있다.
+2. 각 경로가 정확히 `<app>/overlays/<environment>` 깊이인지 확인하고, `<app>-<environment>`를 계산한다. 빈 세그먼트나 허용하지 않는 이름 형식도 여기서 막는다.
+3. 계산된 이름을 정렬해 중복을 검사한다. 중복이면 **계산된 이름과 충돌한 두 경로를 모두** 로그에 출력하고 실패한다.
+4. 검사 결과의 `경로 | Application 이름` 표를 CI 요약 또는 PR 코멘트에 남긴다. 리뷰어가 glob 매칭과 이름 규칙을 한 번에 대조할 수 있다.
+
+예를 들어 `app-a/overlays/prd`와 `app-b/overlays/prd`가 둘 다 `prd`로 계산되면, 실패 메시지는 `Application name prd: .../app-a/overlays/prd, .../app-b/overlays/prd`처럼 원인을 바로 보여줘야 한다. 단순히 "중복됨"이라고만 하면 다시 제너레이터 문제인지 템플릿 문제인지 추적해야 한다.
+
+이 규칙은 템플릿과 같은 이름 계약을 써야 한다. fasttemplate을 유지한다면 `{{path[2]}}-{{path.basename}}`, Go Template으로 전환한다면 `{{index .path.segments 2}}-{{.path.basename}}`처럼 CI의 계산식과 `metadata.name`을 함께 바꾼다. Go Template은 `goTemplate: true`로 활성화하며, 공식 문서도 정의되지 않은 값이 조용히 무시되지 않도록 `goTemplateOptions: ["missingkey=error"]`를 권장한다.[^2]
+
+경로 depth 또는 `directories.path`, `template.metadata.name`을 바꾸는 PR에는 위 CI와 별도로 플랫폼 담당자의 리뷰를 요구하는 게 좋다. 이 세 항목은 따로 보면 평범한 디렉터리 정리나 문자열 수정처럼 보이지만, 합쳐지면 생성되는 Application의 집합을 바꾸기 때문이다.
+
+### 이 검증이 보장하지 않는 것
+
+이 CI는 이 글의 단일 Git 디렉터리 제너레이터와 이름 규칙만 확인한다. 실제 ApplicationSet controller가 클러스터에서 렌더링·적용되는지, 다른 generator와 Matrix/Merge 조합에서 파라미터가 충돌하는지, 권한·Project·대상 클러스터가 맞는지는 확인하지 못한다. 그런 변경은 별도 환경에서 generated `Application`의 이름, source path, destination을 확인해야 한다.
+
+그래도 이 경로 계약에서는 가장 값싼 방어선이다. “디렉터리는 매칭됐는데 Application이 왜 하나지?”라는 문제를 배포 후 화면이 아니라, 경로와 이름이 함께 보이는 PR에서 잡을 수 있다.
 
 ## 덤: Go Template으로 옮길 때 같이 바꿔야 한다
 
