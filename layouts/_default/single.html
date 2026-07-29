@@ -39,12 +39,12 @@
       {{ if or $showToc $showProtocols }}
         <div class="order-first lg:ms-auto px-0 lg:order-last lg:ps-8 lg:max-w-2xs">
           <div class="print:hidden lg:sticky {{ $topClass }}">
-            {{ if $showProtocols }}{{ partial "protocol-sidebar.html" . }}{{ end }}
             {{ if $showToc }}
               <div class="toc ps-5">
                 {{ partial "toc.html" . }}
               </div>
             {{ end }}
+            {{ if $showProtocols }}{{ partial "protocol-sidebar.html" . }}{{ end }}
           </div>
         </div>
       {{ end }}
