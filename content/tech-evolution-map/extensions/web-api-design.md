@@ -6,6 +6,9 @@ mainNode = 'http'
 mainNodeTitle = 'HTTP'
 summary = 'HTTP의 제약을 그대로 복사하는 것이 아니라, 리소스·무상태성·캐시라는 선택이 API 계약과 운영에 무엇을 요구하는지 읽는다.'
 showTableOfContents = true
+protocols = [
+  { name = 'HTTP', layer = 4, layer_name = 'Application', pdu = 'message' },
+]
 [[next]]
 title = '브라우저 상호작용'
 url = '/tech-evolution-map/extensions/browser-interactions/'

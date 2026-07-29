@@ -2,6 +2,10 @@
 date = '2026-07-27T00:00:00+09:00'
 draft = false
 title = 'TargetGroupBinding을 ALB 생성 설정으로 알았다가, 포트부터 다시 봤다'
+protocols = [
+  { name = 'TCP', layer = 3, layer_name = 'Transport', pdu = 'segment' },
+  { name = 'IP', layer = 2, layer_name = 'Internet', pdu = 'packet' },
+]
 +++
 
 기존 target group에 Kubernetes 서비스를 붙이는 매니페스트를 처음 펼쳐 봤을 때였다.
