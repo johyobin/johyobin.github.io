@@ -7,7 +7,7 @@ mainNodeTitle = 'JavaScript'
 summary = '비동기 요청과 부분 갱신은 화면을 빠르게 만들지만, 클라이언트 상태·중복 요청·API 부하라는 새로운 운영 책임을 만든다.'
 showTableOfContents = true
 protocols = [
-  { name = 'HTTP', layer = 4, layer_name = 'Application', pdu = 'message' },
+  { name = 'HTTP', layer = 4, layer_name = 'Application', pdu = 'message', section = '페이지 전체를 다시 받지 않는 선택' },
 ]
 [[next]]
 title = '웹 API 설계'

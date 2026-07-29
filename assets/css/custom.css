@@ -37,6 +37,8 @@
 .protocol-sidebar-layer { grid-column: 1 / -1; display: flex; gap: .35rem; color: rgb(var(--color-neutral-400)); font-size: .65rem; }
 .protocol-sidebar-item strong { color: inherit; font-size: .8rem; }
 .protocol-sidebar-pdu { color: #a5f3fc; font-size: .72rem; }
+.protocol-sidebar-section { grid-column: 1 / -1; color: rgb(var(--color-neutral-300)); font-size: .67rem; line-height: 1.45; text-decoration: none; }
+.protocol-sidebar-section:hover { color: #67e8f9; text-decoration: underline; text-underline-offset: 2px; }
 
 @media (max-width: 1023px) {
   .protocol-sidebar { width: 100%; }

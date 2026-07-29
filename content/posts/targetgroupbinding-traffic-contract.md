@@ -3,8 +3,8 @@ date = '2026-07-27T00:00:00+09:00'
 draft = false
 title = 'TargetGroupBinding을 ALB 생성 설정으로 알았다가, 포트부터 다시 봤다'
 protocols = [
-  { name = 'TCP', layer = 3, layer_name = 'Transport', pdu = 'segment' },
-  { name = 'IP', layer = 2, layer_name = 'Internet', pdu = 'packet' },
+  { name = 'TCP', layer = 3, layer_name = 'Transport', pdu = 'segment', section = 'ip target은 Pod 수신 포트까지 확인하게 만든다' },
+  { name = 'IP', layer = 2, layer_name = 'Internet', pdu = 'packet', section = 'ip target은 Pod 수신 포트까지 확인하게 만든다' },
 ]
 +++
 
