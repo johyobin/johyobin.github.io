@@ -9,6 +9,7 @@ title = '공용 CI Runner를 Deployment 하나로 보면 놓치는 것'
 ## 대표 사례 요약
 
 - **문제**: 여러 프로젝트의 빌드를 공용 Kubernetes executor에서 실행해야 했다. 편하게 한 Runner에 다 받으면 권한·cache·순간 자원 사용량이 섞일 위험이 있었다.
+- **조직 맥락과 제약**: 공용 실행 환경에서는 파이프라인을 작성하는 쪽과 Kubernetes·object storage 권한을 관리하는 쪽의 책임이 분리될 수 있다. 따라서 한 프로젝트의 선택이 다른 프로젝트의 권한·자원을 바꾸지 않도록 실행 조건을 설정으로 제한해야 했다.
 - **확인 범위**: GitOps values에서 non-root controller 실행, Job Pod의 CPU/메모리 request·limit, 전용 namespace와 ServiceAccount, untagged job 비허용, protected·locked Runner, 프로젝트 비공유 object-storage cache 설정을 확인했다.
 - **판단**: Runner controller와 Job Pod의 자원을 분리하고, 태그·보호 설정·전용 ServiceAccount·프로젝트별 cache로 실행 경계를 나눴다.
 - **검증 기준**: controller와 Job Pod의 resource pressure, tag별 대기 시간·실패율, cache hit/miss, ServiceAccount–IAM association과 RBAC를 각각 확인해야 한다.
@@ -34,6 +35,16 @@ controller는 계속 살아 있어야 하는 제어면이다. 반대로 Maven �
 공용 Runner에서 untagged job을 받으면, 작성자가 명시적으로 고르지 않은 Job도 이 실행 환경으로 들어올 수 있다. 확인한 구성에서는 untagged job을 받지 않고, 파이프라인 단계별 Runner tag로 Maven 빌드와 이미지 빌드를 나눴다. protected·locked 설정도 함께 뒀다.
 
 이 선택은 “빌드가 어디서 실행되는지”를 파이프라인에서 읽을 수 있게 한다. 동시에 Runner를 늘릴 때도 모든 Job을 같은 권한·같은 크기의 Pod에서 실행해야 한다는 가정을 피할 수 있다. 다만 tag만으로 격리가 완성되지는 않는다. 해당 Runner를 쓸 수 있는 프로젝트·브랜치와 Kubernetes RBAC가 같이 맞아야 한다.
+
+## 공용 Runner는 팀 사이의 실행 인터페이스다
+
+공용 Runner를 두는 이유는 각 팀이 Kubernetes executor와 cache를 따로 만들지 않아도 빌드할 수 있게 하기 위해서다. 이때 Runner는 단순한 공용 인프라가 아니라, 파이프라인 작성자와 플랫폼 운영자가 만나는 실행 인터페이스가 된다.
+
+파이프라인 작성자는 tag로 필요한 실행 환경을 선택한다. 플랫폼 운영자는 그 tag가 어떤 Job Pod 자원, ServiceAccount, cache 정책으로 이어지는지 유지한다. 둘 사이의 약속이 없으면 “공용”은 편의의 다른 말이 된다. untagged Job을 모두 받거나, 모든 Job에 같은 ServiceAccount와 cache를 주면 새 프로젝트를 붙이는 일이 기존 프로젝트의 위험과 비용에도 영향을 준다.
+
+그래서 이 구성에서는 모든 팀에 같은 자유도를 주기보다, Job이 들어오는 경로와 실행 조건을 먼저 고정했다. untagged Job을 받지 않고, 단계별 tag로 Maven 빌드와 이미지 빌드를 나눴다. 프로젝트별 cache를 둔 것도 같은 판단이다. 재사용 범위는 줄어들 수 있지만, 어떤 프로젝트의 빌드 데이터와 실패가 어디에 영향을 주는지는 더 좁혀 볼 수 있다.
+
+이 설계가 특정 조직 구조에 언제나 맞는 답은 아니다. 빌드 종류와 권한 요구가 거의 같고, 운영 주체도 하나라면 여러 tag·cache 경계가 불필요한 운영 부담일 수 있다. 반대로 여러 팀이 공용 실행면을 쓰고 각자의 배포 권한·비밀값·자원 요구가 다르다면, 경계를 코드와 설정으로 남기는 편이 새 팀을 온보딩하거나 장애를 조사할 때의 책임 범위를 분명하게 만든다. 여기서 확인한 것은 후자의 경계를 의도한 설정이며, 실제 온보딩 속도나 운영 부담 변화는 별도 지표로 검증해야 한다.
 
 ## ServiceAccount 권한은 Job Pod 기준으로 다시 본다
 
