@@ -1,10 +1,10 @@
 +++
 date = '2026-08-01T00:00:00+09:00'
 draft = false
-title = '공용 CI Runner를 Deployment 하나로 보면 놓치는 것'
+title = '공용 GitLab Runner를 Deployment 하나로 보면 놓치는 것'
 +++
 
-처음에는 CI Runner도 애플리케이션 하나처럼 보였다. Helm chart로 설치하고 `Deployment`가 뜨면 끝일 것 같았다. 그런데 Runner는 요청을 직접 처리하는 서버가 아니었다. Job이 들어올 때마다 새 Pod를 만들고, 그 Pod가 소스·변수·cache·클러스터 권한을 만진다. Runner를 공용으로 운영한다는 건 Deployment 하나를 운영하는 게 아니라 **빌드 실행면의 경계를 설계하는 일**이었다.
+처음에는 GitLab Runner도 애플리케이션 하나처럼 보였다. Helm chart로 설치하고 `Deployment`가 뜨면 끝일 것 같았다. 그런데 Runner는 요청을 직접 처리하는 서버가 아니었다. Job이 들어올 때마다 새 Pod를 만들고, 그 Pod가 소스·변수·cache·클러스터 권한을 만진다. Runner를 공용으로 운영한다는 건 Deployment 하나를 운영하는 게 아니라 **빌드 실행면의 경계를 설계하는 일**이었다.
 
 ## 대표 사례 요약
 
