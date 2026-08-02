@@ -1,5 +1,5 @@
 +++
-title = 'DevOps/SRE Portfolio'
+title = '대표 운영 사례 | DevOps/SRE Portfolio'
 url = '/portfolio/'
 layout = 'single'
 date = '2026-07-24T00:00:00+09:00'
@@ -8,7 +8,7 @@ draft = false
 
 애플리케이션 동작과 운영 제약을 함께 고려해 장애·배포·플랫폼을 설계하는 DevOps/SRE 엔지니어다.
 
-이 페이지는 도구 목록보다 실제 운영 문제를 어떻게 좁히고, 어떤 기준으로 설계했으며, 무엇을 검증했는지 보여주는 대표 사례를 모아 둔다.
+채용 담당자를 위해, 실제 운영 문제를 어떻게 좁히고 어떤 기준으로 설계했으며 무엇을 검증했는지 보여주는 대표 사례 네 편을 모았다. 도구 목록이 아니라 판단과 운영 책임을 중심으로 읽을 수 있다.
 
 ## 핵심 역량
 
@@ -24,7 +24,7 @@ draft = false
 
 GitOps controller와 애플리케이션 리소스의 관리 경계를 구분한다. 생성·갱신·drift 복구·삭제의 주체를 명확히 해 운영 중 확인 범위를 좁힌다.
 
-## 대표 사례
+## 대표 운영 사례
 
 ### [JVM 메모리 사용률만 믿었다가, 장애를 세 번 연달아 겪었다](/posts/jvm-memory-usage-not-load/)
 
@@ -50,9 +50,17 @@ ApplicationSet과 App-of-Apps를 함께 쓸 때 Git 변경이 어떤 controller�
 - **판단**: ApplicationSet의 generated `Application` 관리와 application controller의 workload sync를 분리하고, `prune`·Application 삭제·리소스 보존 정책을 별도 판단
 - **결과**: 생성·갱신·삭제마다 확인할 controller와 정책을 좁혔으며, 삭제 전에는 비운영 환경 검증과 변경 리뷰가 필요하다는 기준을 마련
 
-## 더 보기
+### [공용 CI Runner를 Deployment 하나로 보면 놓치는 것](/posts/kubernetes-runner-isolation/)
 
-[전체 기술 블로그](/posts/)에는 GitOps 운영 오류 예방과 애플리케이션·인프라 경계 설계에 관한 추가 기록이 있다.
+여러 프로젝트가 공용 Kubernetes executor를 사용하면서, Runner manager와 빌드 Job Pod의 자원·권한·cache 경계를 분리한 사례다. 모든 빌드를 한곳에 모으는 대신, 어떤 Job이 어떤 조건에서 실행되는지 설명 가능한 실행 환경을 설계했다.
+
+- **문제**: 공용 Runner에서 프로젝트별 권한·cache·순간 자원 사용량이 섞일 위험
+- **판단**: Runner manager와 Job Pod의 자원을 분리하고, tag·보호 설정·전용 ServiceAccount·프로젝트별 cache로 실행 경계를 설정
+- **검증 범위와 한계**: 설정과 책임 경계는 확인했으며, 피크 빌드의 대기 시간·cache 적중률·비용 효과는 별도 관측이 필요
+
+## 전체 기술 아카이브
+
+[전체 기술 블로그](/posts/)에는 위 대표 사례의 보조 자료와 GitOps 운영 오류 예방, 애플리케이션·인프라 경계 설계에 관한 추가 기록을 보관한다. 모든 글은 남기되, 처음 읽을 글은 이 페이지의 네 사례로 정리했다.
 
 ### 관련 사례 보조 자료
 
