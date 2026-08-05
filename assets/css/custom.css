@@ -35,44 +35,6 @@ body {
   text-decoration-color: currentColor;
 }
 
-/* A small amber signal gives the home feed a clear visual starting point. */
-main > section > h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-main > section > h2::before {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  background: rgb(var(--color-secondary-500));
-  box-shadow: 0 0 0 0.25rem rgb(var(--color-secondary-100));
-  content: "";
-}
-
-main > section > .space-y-10 > .article-link--simple:first-child {
-  padding-inline-start: 1rem;
-  border-inline-start: 3px solid rgb(var(--color-secondary-500));
-}
-
-main > section > .space-y-10 > .article-link--simple:first-child h2 {
-  color: rgb(var(--color-secondary-700));
-}
-
-.dark main > section > h2::before {
-  background: rgb(var(--color-secondary-300));
-  box-shadow: 0 0 0 0.25rem rgb(var(--color-secondary-900));
-}
-
-.dark main > section > .space-y-10 > .article-link--simple:first-child {
-  border-inline-start-color: rgb(var(--color-secondary-300));
-}
-
-.dark main > section > .space-y-10 > .article-link--simple:first-child h2 {
-  color: rgb(var(--color-secondary-200));
-}
-
 /* Keep Mermaid diagrams readable without changing the article layout. */
 .article-content .mermaid {
   box-sizing: border-box;
