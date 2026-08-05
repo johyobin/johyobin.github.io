@@ -1,3 +1,40 @@
+/* Global reading rhythm: let the writing carry the page. */
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+.article-content {
+  font-size: 1.0625rem;
+}
+
+.article-content :where(p, li) {
+  line-height: 1.82;
+}
+
+.article-content :where(h2, h3) {
+  scroll-margin-top: 5rem;
+  letter-spacing: -0.018em;
+}
+
+.article-content :where(h2) {
+  margin-top: 2.7em;
+  padding-top: 0.9em;
+  border-top: 1px solid rgb(var(--color-neutral-200));
+}
+
+.article-content :where(a:not(.not-prose *)) {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--color-primary-300));
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.article-content :where(a:not(.not-prose *)):hover {
+  text-decoration-color: currentColor;
+}
+
 /* Keep Mermaid diagrams readable without changing the article layout. */
 .article-content .mermaid {
   box-sizing: border-box;
