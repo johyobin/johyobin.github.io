@@ -1,5 +1,5 @@
 theme = "blowfish"
-baseURL = "https://johyobin.github.io/"
+baseURL = "https://kedzie-dev.github.io/"
 defaultContentLanguage = "ko"
 enableRobotsTXT = true
 buildDrafts = false

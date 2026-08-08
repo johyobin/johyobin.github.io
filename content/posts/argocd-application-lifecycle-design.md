@@ -171,7 +171,7 @@ spec:
 - ApplicationSet generator에서 서비스 경로 자체가 빠졌을 때는 generated `Application`의 삭제와 `preserveResourcesOnDeletion`이 배포 리소스 보존에 영향을 준다.
 - App-of-Apps source에서 child `Application` 매니페스트가 빠졌을 때는 parent의 prune과 child `Application`의 finalizer를 함께 봐야 한다.
 
-삭제를 설계할 때는 “어떤 리소스를 자동으로 지울까”보다 “어떤 계층이 사라질 때 무엇을 남길까”를 먼저 정해야 한다. 이 글에서는 finalizer와 cascading deletion의 상세 동작을 반복하지 않는다. 그 내용은 [앞선 삭제 글](https://johyobin.github.io/posts/argocd-application-lifecycle/)에서 별도로 다뤘다.
+삭제를 설계할 때는 “어떤 리소스를 자동으로 지울까”보다 “어떤 계층이 사라질 때 무엇을 남길까”를 먼저 정해야 한다. 이 글에서는 finalizer와 cascading deletion의 상세 동작을 반복하지 않는다. 그 내용은 [앞선 삭제 글](https://kedzie-dev.github.io/posts/argocd-application-lifecycle/)에서 별도로 다뤘다.
 
 ## 마무리: 생명주기 설계는 controller 경계부터 시작한다
 
