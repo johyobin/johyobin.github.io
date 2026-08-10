@@ -1,12 +1,12 @@
 colorScheme = "editorial"
-defaultAppearance = "light"
-autoSwitchAppearance = true
+defaultAppearance = "dark"
+autoSwitchAppearance = false
 enableSearch = true
 enableCodeCopy = true
 
 [homepage]
   layout = "hero"
-  homepageImage = "hero-terminal.svg"
+  homepageImage = "hero-space.svg"
   showRecent = true
   showRecentItems = 5
   showMoreLink = true

@@ -1,7 +1,53 @@
-/* Global reading rhythm: let the writing carry the page. */
+/* Global reading rhythm, set against a deep-space sky. */
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   text-rendering: optimizeLegibility;
+  background-color: #020617;
+  background-image:
+    radial-gradient(circle at 18% -8%, rgb(76 29 149 / .32), transparent 28rem),
+    radial-gradient(circle at 88% 24%, rgb(8 145 178 / .16), transparent 26rem),
+    radial-gradient(circle at 12% 65%, rgb(255 255 255 / .8) 0 .75px, transparent 1px),
+    radial-gradient(circle at 64% 42%, rgb(255 255 255 / .55) 0 .65px, transparent 1px),
+    radial-gradient(circle at 92% 76%, rgb(255 255 255 / .45) 0 .65px, transparent 1px);
+  background-size: auto, auto, 47px 53px, 71px 79px, 97px 89px;
+  background-attachment: fixed;
+}
+
+header {
+  border-bottom: 1px solid rgb(129 140 248 / .16);
+}
+
+header a:hover {
+  text-shadow: 0 0 18px rgb(103 232 249 / .7);
+}
+
+/* Homepage: retain the theme's layout while giving the hero a spacecraft-window feel. */
+article.max-w-full > div > div > div.relative.shadow-xl {
+  border: 1px solid rgb(165 243 252 / .24);
+  box-shadow: 0 25px 70px rgb(2 6 23 / .7), 0 0 55px rgb(109 40 217 / .2);
+}
+
+article.max-w-full > div > div > div.relative.shadow-xl::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid rgb(255 255 255 / .12);
+  border-radius: inherit;
+  pointer-events: none;
+  content: "";
+}
+
+article.max-w-full > div > div > div.relative.shadow-xl > div.relative {
+  z-index: 2;
+}
+
+article.max-w-full h1 {
+  letter-spacing: -.045em;
+  text-shadow: 0 0 32px rgb(165 243 252 / .38);
+}
+
+article.max-w-full h2 {
+  text-shadow: 0 0 18px rgb(196 181 253 / .28);
 }
 
 .article-content {
