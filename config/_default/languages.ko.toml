@@ -2,7 +2,7 @@ disabled = false
 locale = "ko-kr"
 label = "한국어"
 weight = 1
-title = "johyobin's devops blog"
+title = "kedzie's devops blog"
 
 [params]
   displayName = "KO"
