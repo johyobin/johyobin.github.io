@@ -1,0 +1,21 @@
+{{ define "main" }}
+  <section class="collection-page">
+    <header class="collection-header narrow">
+      <p class="eyebrow">TAXONOMY</p>
+      <h1>{{ .Title }}</h1>
+    </header>
+    <div class="ledger-list">
+      {{ range $index, $page := .Pages }}
+        <article class="ledger-row">
+          <span class="ledger-index">{{ printf "%02d." (add $index 1) }}</span>
+          <div>
+            <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+            {{ partial "article-meta.html" . }}
+            <p>{{ .Params.summary | default .Summary }}</p>
+          </div>
+          <a class="row-link" href="{{ .RelPermalink }}">읽기 <span aria-hidden="true">→</span></a>
+        </article>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}

@@ -1,6 +1,6 @@
 [[main]]
-  name = "포트폴리오"
-  pageRef = "portfolio"
+  name = "Cases"
+  pageRef = "cases"
   weight = 10
 
 [[main]]
@@ -9,11 +9,11 @@
   weight = 15
 
 [[main]]
-  name = "기술 진화 지도"
-  pageRef = "tech-evolution-map"
+  name = "Tech Map"
+  pageRef = "tech-map"
   weight = 18
 
 [[main]]
-  name = "글"
-  pageRef = "posts"
+  name = "Notes"
+  pageRef = "notes"
   weight = 20

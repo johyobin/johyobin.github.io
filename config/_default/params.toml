@@ -1,16 +1,15 @@
-colorScheme = "editorial"
-defaultAppearance = "dark"
+colorScheme = "atlas"
+defaultAppearance = "parchment"
 autoSwitchAppearance = false
 enableSearch = true
 enableCodeCopy = true
 
 [homepage]
-  layout = "hero"
-  homepageImage = "hero-space.svg"
+  layout = "atlas"
   showRecent = true
   showRecentItems = 5
   showMoreLink = true
-  showMoreLinkDest = "/posts/"
+  showMoreLinkDest = "/notes/"
 
 [article]
   showDate = true

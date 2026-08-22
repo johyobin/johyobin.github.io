@@ -1,0 +1,99 @@
+{{ $landmarks := .landmarks }}
+<section class="atlas-stage" aria-labelledby="atlas-title">
+  <div class="atlas-copy">
+    <p class="eyebrow">KEDZIE DEV ATLAS</p>
+    <h1 id="atlas-title">Kedzie Dev Atlas</h1>
+    <p>Kubernetes, GitOps, SRE 운영 기록을 지도로 탐색합니다.</p>
+    <div class="hero-actions">
+      <a class="button primary" href="#landmark-registry">지도 탐색</a>
+      <a class="button" href="{{ "/cases/" | relLangURL }}">대표 사례 보기</a>
+    </div>
+  </div>
+
+  <div class="atlas-map-wrap">
+    <figure class="atlas-map" aria-labelledby="atlas-map-title atlas-map-desc">
+      <figcaption class="sr-only" id="atlas-map-title">Atlas Landmark Map</figcaption>
+      <p class="sr-only" id="atlas-map-desc">왼쪽 아래 Reliability Compass와 Runtime Harbor, 오른쪽 Argo CD Sea까지 보이는 전체 운영 지도입니다.</p>
+      <svg viewBox="0 0 1400 820" role="img" aria-hidden="true" focusable="false">
+        <defs>
+          <pattern id="paper-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+            <path d="M 34 0 L 0 0 0 34" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.12"/>
+          </pattern>
+          <filter id="ink-wobble">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2"/>
+          </filter>
+        </defs>
+        <rect width="1400" height="820" rx="8" class="map-paper"/>
+        <rect width="1400" height="820" fill="url(#paper-grid)" class="map-grid"/>
+        <g class="map-ink" filter="url(#ink-wobble)">
+          <path d="M119 410 C148 311 255 219 414 190 C566 162 658 85 829 131 C967 168 1050 246 1118 342 C1193 448 1304 507 1259 632 C1227 719 1069 728 939 698 C822 671 733 735 598 717 C478 701 420 631 304 642 C201 652 90 608 82 522 C79 485 96 445 119 410Z" class="island"/>
+          <path d="M142 407 C260 404 326 451 432 436 C540 421 610 335 713 338 C828 341 888 421 1008 414 C1114 408 1175 376 1262 399" class="coast-line"/>
+          <path d="M246 496 C319 458 417 481 486 530 C578 595 681 613 792 563 C885 521 963 518 1031 572" class="route-line"/>
+          <path d="M340 684 C429 626 520 608 628 636 C750 668 854 648 940 598 C1015 554 1112 548 1203 606" class="route-line dashed"/>
+          <path d="M238 255 L282 162 L327 255 Z M279 164 L279 104 M250 210 L307 210 M260 255 L260 306 M299 255 L299 306" class="landmark-shape"/>
+          <path d="M638 285 h274 v164 h-274 z M680 285 v-82 h74 v82 M796 285 v-126 h76 v126 M706 449 v-78 h64 v78 M825 449 v-95 h52 v95 M626 331 h-68 v118 h68 M912 323 h82 v126 h-82" class="landmark-shape"/>
+          <path d="M489 624 h222 l-26 58 h-171 z M516 590 h58 v34 h-58 M616 578 h92 v46 h-92 M535 683 c56 24 111 24 166 0" class="landmark-shape"/>
+          <path d="M996 607 C1055 568 1115 565 1175 606 C1131 646 1052 650 996 607Z M1087 556 v89" class="landmark-shape"/>
+          <path d="M1192 372 c29 0 52 24 52 53 s-23 53-52 53-52-24-52-53 23-53 52-53Z M1192 392 v66 M1161 425 h62" class="landmark-shape"/>
+          <path d="M178 666 m-89 0 a89 89 0 1 0 178 0 a89 89 0 1 0 -178 0 M178 578 v176 M90 666 h176 M116 604 l124 124 M240 604 l-124 124" class="compass"/>
+          <path d="M177 613 l22 53-22 53-22-53z" class="compass-fill"/>
+          {{ range $landmark := $landmarks }}
+            {{ with $landmark.labelX }}<text x="{{ . }}" y="{{ $landmark.labelY }}">{{ $landmark.label }}</text>{{ end }}
+          {{ end }}
+        </g>
+      </svg>
+      {{ range $index, $landmark := $landmarks }}
+        <button
+          class="map-hotspot"
+          type="button"
+          data-landmark="{{ .id }}"
+          style="--x: {{ .x }}%; --y: {{ .y }}%;"
+          aria-controls="atlas-panel"
+          aria-pressed="{{ if eq $index 0 }}true{{ else }}false{{ end }}">
+          <span>{{ .short }}</span>
+        </button>
+      {{ end }}
+    </figure>
+
+    <aside id="atlas-panel" class="atlas-panel" aria-live="polite">
+      {{ range $index, $landmark := $landmarks }}
+        {{ $related := where site.RegularPages "Params.landmarks" "intersect" (slice .id) }}
+        <article data-landmark-panel="{{ .id }}"{{ if ne $index 0 }} hidden{{ end }}>
+          <p>{{ .badge }}</p>
+          <h2>{{ .label }}</h2>
+          <p>{{ .description }}</p>
+          {{ with first 3 $related.ByDate.Reverse }}
+            <ul class="landmark-links" aria-label="{{ $landmark.label }} 관련 콘텐츠">
+              {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}
+            </ul>
+          {{ else }}
+            <p class="landmark-empty">연결된 콘텐츠가 아직 없습니다.</p>
+          {{ end }}
+        </article>
+      {{ end }}
+    </aside>
+  </div>
+</section>
+
+<section id="landmark-registry" class="landmark-registry" aria-labelledby="landmark-registry-title">
+  <div class="section-heading">
+    <p class="eyebrow">LANDMARK REGISTRY</p>
+    <h2 id="landmark-registry-title">접근 가능한 지도 목록</h2>
+  </div>
+  <div class="landmark-grid">
+    {{ range $landmarks }}
+      {{ $related := where site.RegularPages "Params.landmarks" "intersect" (slice .id) }}
+      <article class="landmark-card" id="landmark-{{ .id }}">
+        <span>{{ .badge }}</span>
+        <h3>{{ .label }}</h3>
+        <p>{{ .description }}</p>
+        {{ with first 3 $related.ByDate.Reverse }}
+          <ul class="landmark-links">
+            {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}
+          </ul>
+        {{ end }}
+      </article>
+    {{ end }}
+  </div>
+</section>

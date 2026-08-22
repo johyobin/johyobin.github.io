@@ -1,0 +1,26 @@
+{{ define "main" }}
+  {{ $landmarks := hugo.Data.landmarks.landmarks }}
+  {{ partial "atlas-map.html" (dict "context" . "landmarks" $landmarks) }}
+
+  {{ $cases := first 4 (where site.RegularPages "Section" "cases") }}
+  {{ if gt (len $cases) 0 }}
+    <section class="home-ledger" aria-labelledby="home-cases-title">
+      <div class="section-heading centered">
+        <p class="eyebrow">OPERATIONAL CASES</p>
+        <h2 id="home-cases-title">대표 운영 사례</h2>
+      </div>
+      <div class="ledger-list compact">
+        {{ range $index, $page := $cases }}
+          <article class="ledger-row">
+            <span class="ledger-index">{{ printf "%02d." (add $index 1) }}</span>
+            <div>
+              <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+              <p>{{ .Params.summary | default .Summary }}</p>
+            </div>
+            <a class="row-link" href="{{ .RelPermalink }}">사례 읽기 <span aria-hidden="true">→</span></a>
+          </article>
+        {{ end }}
+      </div>
+    </section>
+  {{ end }}
+{{ end }}
