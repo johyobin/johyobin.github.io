@@ -1,0 +1,57 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/taplctl hook-event --event UserPromptSubmit --mode observe"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/taplctl hook-event --event PreToolUse --mode observe"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/taplctl hook-event --event PermissionRequest --mode observe"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|MultiEdit|web\\.run|WebSearch|WebFetch|Browser",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/taplctl hook-event --event PostToolUse --mode observe"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/taplctl hook-event --event Stop --mode observe"
+          }
+        ]
+      }
+    ]
+  }
+}

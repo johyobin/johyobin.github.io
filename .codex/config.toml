@@ -1,0 +1,17 @@
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+personality = "pragmatic"
+suppress_unstable_features_warning = true
+
+[features]
+default_mode_request_user_input = true
+hooks = true
+
+[mcp_servers]
+
+[mcp_servers.tapl]
+command = "/opt/homebrew/bin/taplctl"
+args = ["mcp"]
+enabled = true
+required = false
+default_tools_approval_mode = "auto"
