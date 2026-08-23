@@ -4,8 +4,8 @@ label = "GitOps Lighthouse"
 short = "GitOps"
 badge = "Lighthouse"
 description = "Git desired state, 배포 버전 계약, Argo CD sync와 drift를 다루는 영역."
-x = 22
-y = 23
+x = 25
+y = 18
 labelX = 285
 labelY = 229
 
@@ -15,8 +15,8 @@ label = "Kubernetes Citadel"
 short = "Kubernetes"
 badge = "Citadel"
 description = "워크로드 배치, controller 경계, 리소스 격리와 확장을 확인하는 영역."
-x = 52
-y = 32
+x = 56
+y = 28
 labelX = 685
 labelY = 198
 
@@ -26,8 +26,8 @@ label = "Platform Workshop"
 short = "Platform"
 badge = "Workshop"
 description = "팀의 책임 경계, 공용 실행 환경, 셀프서비스 인터페이스를 설계하는 영역."
-x = 68
-y = 63
+x = 62
+y = 52
 
 [[landmarks]]
 id = "delivery"
@@ -35,17 +35,17 @@ label = "CI/CD Route"
 short = "CI/CD"
 badge = "Route"
 description = "이미지 생성, 검증, 배포 승인과 rollback 경로를 분리하는 영역."
-x = 40
-y = 55
+x = 51
+y = 61
 
 [[landmarks]]
 id = "runtime"
-label = "Runtime Harbor"
+label = "Docker Harbor"
 short = "Runtime"
 badge = "Harbor"
-description = "컨테이너, ECS, JVM 메모리, 실행 단위의 실제 사용 가능 용량을 보는 영역."
-x = 37
-y = 76
+description = "컨테이너, ECS, JVM 메모리와 실행 단위의 실제 사용 가능 용량을 보는 부두."
+x = 40
+y = 74
 labelX = 514
 labelY = 736
 
@@ -55,17 +55,17 @@ label = "Traffic Strait"
 short = "Traffic"
 badge = "Strait"
 description = "Load balancer, Service, TargetGroupBinding, health check가 만나는 영역."
-x = 73
+x = 72
 y = 72
 
 [[landmarks]]
 id = "argocd"
-label = "Argo CD Sea"
+label = "Argo CD 해역"
 short = "Argo CD"
 badge = "Sea"
-description = "ApplicationSet, Application controller, desired state와 live state를 추적하는 영역."
-x = 88
-y = 47
+description = "Git의 desired state와 클러스터 상태를 동기화하고 drift를 추적하는 운영 영역."
+x = 91
+y = 39
 labelX = 1125
 labelY = 438
 
@@ -75,8 +75,8 @@ label = "Observability Sound"
 short = "Observability"
 badge = "Sound"
 description = "로그, 지표, trace, SLI/SLO로 운영 판단 근거를 좁히는 영역."
-x = 68
-y = 21
+x = 70
+y = 16
 
 [[landmarks]]
 id = "reliability"
@@ -84,7 +84,7 @@ label = "Reliability Compass"
 short = "Reliability"
 badge = "Compass"
 description = "장애 대응, 오류 예산, 복구 범위와 사용자 영향을 함께 판단하는 영역."
-x = 12
-y = 81
+x = 10
+y = 83
 labelX = 88
 labelY = 553

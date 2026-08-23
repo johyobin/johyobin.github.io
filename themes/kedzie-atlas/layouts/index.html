@@ -23,4 +23,6 @@
       </div>
     </section>
   {{ end }}
+
+  {{ partial "atlas-landmark-registry.html" (dict "context" . "landmarks" $landmarks) }}
 {{ end }}
