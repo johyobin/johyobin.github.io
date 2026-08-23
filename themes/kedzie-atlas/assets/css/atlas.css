@@ -280,11 +280,27 @@ button { color: inherit; }
   cursor: pointer;
   transition: transform 160ms ease, background 160ms ease, color 160ms ease;
 }
+.map-hotspot.has-logo {
+  z-index: 2;
+  width: clamp(3.45rem, 5vw, 5.8rem);
+  height: clamp(3.45rem, 5vw, 5.8rem);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.map-marker-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(17, 28, 44, 0.3));
+}
 .map-marker-symbol {
   display: block;
   font: 700 1.35rem/1 var(--font-display);
 }
 .map-marker-label {
+  z-index: 1;
   position: absolute;
   top: calc(100% + 0.45rem);
   left: 50%;
@@ -308,12 +324,23 @@ button { color: inherit; }
 .map-hotspot:hover .map-marker-label,
 .map-hotspot:focus-visible .map-marker-label,
 .map-hotspot[aria-pressed="true"] .map-marker-label { opacity: 1; }
+.map-hotspot--kubernetes .map-marker-label {
+  top: auto;
+  bottom: calc(100% + 0.45rem);
+}
 .map-hotspot:hover,
 .map-hotspot:focus-visible,
 .map-hotspot[aria-pressed="true"] {
   color: var(--paper-soft);
   background: var(--blue);
   transform: translate(-50%, -50%) scale(1.1);
+}
+.map-hotspot.has-logo:hover,
+.map-hotspot.has-logo:focus-visible,
+.map-hotspot.has-logo[aria-pressed="true"] {
+  z-index: 3;
+  background: transparent;
+  color: inherit;
 }
 .map-hotspot:hover span,
 .map-hotspot:focus-visible span { opacity: 1; }
@@ -1004,6 +1031,8 @@ button { color: inherit; }
   .atlas-stage { aspect-ratio: 1672 / 941; }
   .atlas-map img { object-fit: contain; }
   .map-hotspot { width: 2rem; height: 2rem; }
+  .map-hotspot.has-logo { width: 3.15rem; height: 3.15rem; }
+  .map-hotspot:not(.has-logo) { display: none; }
   .map-marker-symbol { font-size: 1.05rem; }
   .map-marker-label { font-size: 0.58rem; }
   .atlas-panel {
