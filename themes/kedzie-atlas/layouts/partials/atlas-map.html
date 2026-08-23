@@ -37,27 +37,26 @@
         </button>
       {{ end }}
     </figure>
+    <aside id="atlas-panel" class="atlas-panel" aria-live="polite">
+      {{ range $landmark := $landmarks }}
+        {{ $related := where site.RegularPages "Params.landmarks" "intersect" (slice .id) }}
+        <article data-landmark-panel="{{ .id }}"{{ if ne .id "argocd" }} hidden{{ end }}>
+          <div class="atlas-panel-title">
+            <p>{{ .badge }}</p>
+            <h2>{{ .label }}</h2>
+          </div>
+          <div class="atlas-panel-content">
+            <p>{{ .description }}</p>
+            {{ with first 3 $related.ByDate.Reverse }}
+              <ul class="landmark-links" aria-label="{{ $landmark.label }} 관련 콘텐츠">
+                {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}
+              </ul>
+            {{ else }}
+              <p class="landmark-empty">연결된 콘텐츠가 아직 없습니다.</p>
+            {{ end }}
+          </div>
+        </article>
+      {{ end }}
+    </aside>
   </div>
-
-  <aside id="atlas-panel" class="atlas-panel" aria-live="polite">
-    {{ range $landmark := $landmarks }}
-      {{ $related := where site.RegularPages "Params.landmarks" "intersect" (slice .id) }}
-      <article data-landmark-panel="{{ .id }}"{{ if ne .id "argocd" }} hidden{{ end }}>
-        <div class="atlas-panel-title">
-          <p>{{ .badge }}</p>
-          <h2>{{ .label }}</h2>
-        </div>
-        <div class="atlas-panel-content">
-          <p>{{ .description }}</p>
-          {{ with first 3 $related.ByDate.Reverse }}
-            <ul class="landmark-links" aria-label="{{ $landmark.label }} 관련 콘텐츠">
-              {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}
-            </ul>
-          {{ else }}
-            <p class="landmark-empty">연결된 콘텐츠가 아직 없습니다.</p>
-          {{ end }}
-        </div>
-      </article>
-    {{ end }}
-  </aside>
 </section>
