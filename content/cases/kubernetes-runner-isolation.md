@@ -3,12 +3,12 @@ title = 'Kubernetes 러너 격리 및 보안'
 date = '2026-07-24T00:00:00+09:00'
 draft = false
 weight = 40
-summary = '멀티 테넌트 환경에서 노드 선별기와 톨러레이션을 통한 워크로드 격리.'
+summary = '공용 Kubernetes executor에서 Runner manager, Job Pod, 권한, cache 경계를 나눈 사례.'
 landmarks = ['kubernetes', 'runtime', 'delivery']
 featured = true
 +++
 
-여러 프로젝트가 공용 Kubernetes executor를 사용하면서 Runner manager와 빌드 Job Pod의 자원, 권한, cache 경계를 분리한 사례다. 모든 빌드를 한곳에 모으는 대신, 어떤 Job이 어떤 조건에서 실행되는지 설명 가능한 실행 환경을 설계했다.
+여러 프로젝트가 공용 Kubernetes executor를 사용할 때 Runner manager와 빌드 Job Pod의 자원, 권한, cache 경계를 분리한 사례다. 어떤 Job이 어떤 조건에서 실행되는지 추적할 수 있도록 실행 환경을 구성했다.
 
 ## 문제
 

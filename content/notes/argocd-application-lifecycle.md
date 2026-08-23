@@ -10,13 +10,13 @@ aliases = ['/posts/argocd-application-lifecycle/']
 
 운영 중인 서비스의 매니페스트 디렉터리 하나를 Git에서 삭제했다. 그러면 Argo CD는 Application만 정리할까, 아니면 해당 Application의 관리 대상 리소스(workload)까지 정리할까?
 
-결론부터 말하면, 삭제 범위는 `prune: true` 하나로 결정되지 않는다. 어떤 controller가 어떤 리소스를 조정하는지, generated `Application`에 finalizer가 있는지, workload를 보존하는 정책이 켜져 있는지를 함께 봐야 한다. 이번 글에서는 ApplicationSet과 App-of-Apps를 같은 “상위 관리 구조”로 뭉뚱그리지 않고, Git 변경이 각 계층을 어떻게 통과하는지 따라가 본다.
+삭제 범위는 `prune: true` 하나로 결정되지 않는다. controller별 관리 대상, generated `Application`의 finalizer, workload 보존 정책을 함께 확인해야 한다. ApplicationSet과 App-of-Apps를 구분해 Git 변경이 각 계층을 어떻게 통과하는지 살펴본다.
 
 여기서 매니페스트 디렉터리는 Git 저장소 안에서 Argo CD `Application`의 `spec.source.path`가 가리키는 디렉터리를 뜻한다.
 
 ## 대표 글과 이 글의 역할
 
-[대표 글](/notes/argocd-application-lifecycle-design/)은 새 서비스 생성, 이미지 갱신, drift 복구, 삭제를 통틀어 어떤 controller가 무엇을 관리하는지 설명한다. 이 글은 그중 **삭제**만 더 깊게 다룬다. `prune`, `Application` 삭제, finalizer, `preserveResourcesOnDeletion`, 삭제 순서와 승인 절차가 각각 무엇을 결정하는지 확인할 때 참고하는 글이다.
+[대표 글](/notes/argocd-application-lifecycle-design/)은 새 서비스 생성, 이미지 갱신, drift 복구, 삭제에서 controller별 관리 범위를 설명한다. 이 글은 그중 **삭제**를 다룬다. `prune`, `Application` 삭제, finalizer, `preserveResourcesOnDeletion`, 삭제 순서와 승인 절차가 각각 무엇을 결정하는지 정리한다.
 
 삭제를 읽는 데 필요한 전제는 세 가지다.
 
@@ -102,7 +102,7 @@ parent source에 새 child 매니페스트를 추가하면 parent가 child `Appl
 
 그 다음 단계는 ApplicationSet과 같다. child `Application`이 삭제될 때 workload까지 지울지는 child Application의 finalizer와 삭제 전파 정책에 달려 있다. child 매니페스트에 `resources-finalizer.argocd.argoproj.io`가 있으면 cascading deletion이 활성화된다.[^6]
 
-반대로 parent에 automated prune이 없다면 Git에서 child 매니페스트를 지워도 parent가 child `Application`을 자동 삭제하지 않는다. 복구한 설정을 실제로 대조해 보니 이 차이가 분명했다. ApplicationSet template에는 자동 prune과 self-heal이 있었지만, App-of-Apps root에는 자동 prune이 활성화되어 있지 않았다. “상위에서 관리한다”는 한 문장만으로는 실제 삭제 결과를 예측할 수 없었던 이유다.
+반대로 parent에 automated prune이 없다면 Git에서 child 매니페스트를 지워도 parent가 child `Application`을 자동 삭제하지 않는다. 복구한 설정을 대조해 보니 ApplicationSet template에는 자동 prune과 self-heal이 있었지만, App-of-Apps root에는 자동 prune이 활성화되어 있지 않았다. “상위에서 관리한다”는 설명만으로는 실제 삭제 결과를 예측할 수 없다.
 
 ## 삭제 범위와 순서는 서로 다른 문제다
 

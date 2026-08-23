@@ -2,13 +2,13 @@
 date = '2026-08-01T00:00:00+09:00'
 draft = false
 title = '공용 GitLab Runner를 Deployment 하나로 보면 놓치는 것'
-summary = 'Runner manager와 Job Pod의 자원, 권한, cache 경계를 분리해 공용 실행 환경을 설명 가능하게 만듭니다.'
+summary = 'Runner manager와 Job Pod의 자원, 권한, cache 경계를 나눠 공용 실행 환경의 책임을 정리합니다.'
 landmarks = ['kubernetes', 'runtime', 'delivery']
 featured = true
 aliases = ['/posts/kubernetes-runner-isolation/']
 +++
 
-처음에는 GitLab Runner도 애플리케이션 하나처럼 보였다. Helm chart로 설치하고 `Deployment`가 뜨면 끝일 것 같았다. 그런데 Runner는 요청을 직접 처리하는 서버가 아니었다. Job이 들어올 때마다 새 Pod를 만들고, 그 Pod가 소스·변수·cache·클러스터 권한을 만진다. Runner를 공용으로 운영한다는 건 Deployment 하나를 운영하는 게 아니라 **빌드 실행 환경의 경계를 설계하는 일**이었다.
+GitLab Runner는 Helm chart로 설치하고 `Deployment`가 실행되면 끝나는 애플리케이션처럼 보일 수 있다. 하지만 Job이 들어올 때마다 새 Pod를 만들고, 그 Pod가 소스·변수·cache·클러스터 권한을 사용한다. 공용 Runner 운영은 Deployment 하나를 운영하는 일이 아니라 **빌드 실행 환경의 경계를 설계하는 일**에 가깝다.
 
 ## 대표 사례 요약
 
@@ -38,13 +38,13 @@ Runner manager는 계속 살아 있어야 하고 Job Pod 생성을 조정한다.
 
 공용 Runner에서 untagged job을 받으면, 작성자가 명시적으로 고르지 않은 Job도 이 실행 환경으로 들어올 수 있다. 확인한 구성에서는 untagged job을 받지 않고, 파이프라인 단계별 Runner tag로 Maven 빌드와 이미지 빌드를 나눴다. protected·locked 설정도 함께 뒀다.
 
-이 선택은 “빌드가 어디서 실행되는지”를 파이프라인에서 읽을 수 있게 한다. 동시에 Runner를 늘릴 때도 모든 Job을 같은 권한·같은 크기의 Pod에서 실행해야 한다는 가정을 피할 수 있다. 다만 tag만으로 격리가 완성되지는 않는다. 해당 Runner를 쓸 수 있는 프로젝트·브랜치와 Kubernetes RBAC가 같이 맞아야 한다.
+이 선택으로 파이프라인에서 빌드가 실행될 환경을 확인할 수 있다. Runner를 늘릴 때도 모든 Job을 같은 권한과 같은 크기의 Pod에서 실행할 필요가 없다. 다만 tag만으로 격리가 완성되지는 않는다. 해당 Runner를 쓸 수 있는 프로젝트·브랜치와 Kubernetes RBAC가 함께 맞아야 한다.
 
 ## 공용 Runner는 팀 간 사용 계약이다
 
 공용 Runner를 두는 이유는 각 팀이 Kubernetes executor와 cache를 따로 만들지 않아도 빌드할 수 있게 하기 위해서다. 이때 Runner는 단순한 공용 인프라가 아니라, 파이프라인 작성자와 플랫폼 운영자가 합의한 사용 규칙이 된다.
 
-파이프라인 작성자는 tag로 필요한 실행 환경을 선택한다. 플랫폼 운영자는 그 tag가 어떤 Job Pod 자원, ServiceAccount, cache 정책으로 이어지는지 유지한다. 둘 사이의 약속이 없으면 “공용”은 편의의 다른 말이 된다. untagged Job을 모두 받거나, 모든 Job에 같은 ServiceAccount와 cache를 주면 새 프로젝트를 붙이는 일이 기존 프로젝트의 위험과 비용에도 영향을 준다.
+파이프라인 작성자는 tag로 실행 환경을 선택한다. 플랫폼 운영자는 각 tag가 어떤 Job Pod 자원, ServiceAccount, cache 정책으로 이어지는지 관리한다. 사용 규칙이 없으면 untagged Job을 모두 받거나 모든 Job에 같은 ServiceAccount와 cache를 주게 되고, 새 프로젝트 추가가 기존 프로젝트의 위험과 비용에 영향을 줄 수 있다.
 
 그래서 이 구성에서는 모든 팀에 같은 자유도를 주기보다, Job이 들어오는 경로와 실행 조건을 먼저 고정했다. untagged Job을 받지 않고, 단계별 tag로 Maven 빌드와 이미지 빌드를 나눴다. 프로젝트별 cache를 둔 것도 같은 판단이다. 재사용 범위는 줄어들 수 있지만, 어떤 프로젝트의 빌드 데이터와 실패가 어디에 영향을 주는지는 더 좁혀 볼 수 있다.
 
@@ -85,7 +85,7 @@ GitLab도 protected ref와 non-protected ref의 cache 분리를 지원한다.[^2
 - cache hit/miss와 저장소 비용이 어떤 트레이드오프를 만드는가
 - ServiceAccount–IAM association과 RBAC가 실제 최소 권한인가
 
-공용 Runner의 목표는 모든 빌드를 한곳에 몰아넣는 게 아니다. 어떤 Job이 어떤 권한과 자원으로 실행되는지 설명할 수 있게 만드는 것이다. 그래야 새 프로젝트를 붙이거나 빌드가 실패했을 때, Runner manager·Job Pod·cache·권한 중 어디를 확인할지 바로 좁힐 수 있다.
+공용 Runner의 목표는 어떤 Job이 어떤 권한과 자원으로 실행되는지 알 수 있게 만드는 것이다. 그래야 새 프로젝트를 추가하거나 빌드가 실패했을 때 Runner manager, Job Pod, cache, 권한 중 어디를 먼저 확인할지 좁힐 수 있다.
 
 [^1]: [GitLab Runner — Kubernetes executor](https://docs.gitlab.com/runner/executors/kubernetes/) — Job별 Pod 생성과 Kubernetes 권한 주의사항.
 [^2]: [GitLab CI/CD — cache](https://docs.gitlab.com/ci/caching/) — 분산 cache와 protected/non-protected ref cache 분리.

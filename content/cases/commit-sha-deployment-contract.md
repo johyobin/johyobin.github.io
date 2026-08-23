@@ -3,7 +3,7 @@ title = 'GitOps 배포 버전 계약과 커밋 SHA'
 date = '2026-07-24T00:00:00+09:00'
 draft = false
 weight = 20
-summary = '이미지 태그 대신 불변의 커밋 SHA를 계약으로 사용하는 배포 파이프라인 무결성 강화.'
+summary = '가변 이미지 태그 대신 커밋 SHA를 배포 기준으로 남긴 사례.'
 landmarks = ['gitops', 'delivery', 'argocd']
 featured = true
 +++
@@ -20,7 +20,7 @@ Git 기록만으로 실행 중인 이미지와 이전 배포 버전을 확실히
 
 ## 결과
 
-이미지, GitOps 태그, Argo CD sync를 따라 배포와 롤백의 확인 지점을 좁히는 흐름을 마련했다.
+이미지, GitOps 태그, Argo CD sync를 따라 배포와 롤백을 확인하는 흐름을 정리했다.
 
 ## Evidence
 

@@ -3,12 +3,12 @@ title = 'Argo CD 애플리케이션 수명 주기 및 controller 경계'
 date = '2026-07-24T00:00:00+09:00'
 draft = false
 weight = 30
-summary = '멀티 클러스터 환경에서 controller 샤딩과 리소스 동기화 지연 해결을 위한 아키텍처 개선.'
+summary = 'ApplicationSet과 App-of-Apps에서 controller별 관리 범위와 확인 지점을 분리한 사례.'
 landmarks = ['argocd', 'gitops', 'kubernetes']
 featured = true
 +++
 
-ApplicationSet과 App-of-Apps를 함께 쓸 때 Git 변경이 어떤 controller를 거쳐 배포 리소스까지 이어지는지 정리했다. 생성, 갱신, drift 복구, 삭제가 같은 설정 하나로 결정되지 않는 이유를 분리했다.
+ApplicationSet과 App-of-Apps를 함께 쓸 때 Git 변경이 어떤 controller를 거쳐 배포 리소스까지 이어지는지 정리했다. 생성, 갱신, drift 복구, 삭제에 서로 다른 설정이 관여하는 이유도 구분했다.
 
 ## 문제
 
