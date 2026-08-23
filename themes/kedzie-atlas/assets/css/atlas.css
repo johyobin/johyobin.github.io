@@ -316,14 +316,8 @@ button { color: inherit; }
   pointer-events: none;
   transition: opacity 160ms ease;
 }
-.map-hotspot--gitops .map-marker-label,
-.map-hotspot--kubernetes .map-marker-label,
-.map-hotspot--delivery .map-marker-label,
-.map-hotspot--runtime .map-marker-label,
-.map-hotspot--argocd .map-marker-label,
 .map-hotspot:hover .map-marker-label,
-.map-hotspot:focus-visible .map-marker-label,
-.map-hotspot[aria-pressed="true"] .map-marker-label { opacity: 1; }
+.map-hotspot:focus-visible .map-marker-label { opacity: 1; }
 .map-hotspot--kubernetes .map-marker-label {
   top: auto;
   bottom: calc(100% + 0.45rem);

@@ -27,12 +27,13 @@ labelY = 198
 [[landmarks]]
 id = "platform"
 label = "Platform Workshop"
-short = "Platform"
-badge = "Workshop"
+short = "GitLab Runner"
+badge = "Platform"
 symbol = "▦"
-description = "팀의 책임 경계, 공용 실행 환경, 셀프서비스 인터페이스를 설계하는 영역."
-x = 62
-y = 52
+icon = "gitlab.png"
+description = "공용 GitLab Runner의 실행 자원, 권한, cache 경계와 셀프서비스 규칙을 설계하는 플랫폼 작업장."
+x = 70
+y = 55
 
 [[landmarks]]
 id = "delivery"
@@ -53,20 +54,10 @@ badge = "Harbor"
 symbol = "⚓"
 icon = "docker.png"
 description = "컨테이너, ECS, JVM 메모리와 실행 단위의 실제 사용 가능 용량을 보는 부두."
-x = 40
-y = 74
+x = 35
+y = 78
 labelX = 514
 labelY = 736
-
-[[landmarks]]
-id = "traffic"
-label = "Traffic Strait"
-short = "Traffic"
-badge = "Strait"
-symbol = "⇄"
-description = "Load balancer, Service, TargetGroupBinding, health check가 만나는 영역."
-x = 72
-y = 72
 
 [[landmarks]]
 id = "argocd"
@@ -83,22 +74,11 @@ labelY = 438
 
 [[landmarks]]
 id = "observability"
-label = "Observability Sound"
-short = "Observability"
+label = "Grafana Sound"
+short = "Grafana"
 badge = "Sound"
 symbol = "⌾"
-description = "로그, 지표, trace, SLI/SLO로 운영 판단 근거를 좁히는 영역."
+icon = "grafana.png"
+description = "Grafana로 로그, 지표, trace, SLI/SLO를 연결해 운영 판단 근거를 좁히는 영역."
 x = 70
 y = 16
-
-[[landmarks]]
-id = "reliability"
-label = "Reliability Compass"
-short = "Reliability"
-badge = "Compass"
-symbol = "✥"
-description = "장애 대응, 오류 예산, 복구 범위와 사용자 영향을 함께 판단하는 영역."
-x = 10
-y = 83
-labelX = 88
-labelY = 553
