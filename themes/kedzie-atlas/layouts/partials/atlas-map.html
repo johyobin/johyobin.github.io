@@ -18,7 +18,11 @@
     <figure class="atlas-map" aria-labelledby="atlas-map-title atlas-map-desc">
       <img src="{{ "/images/kedzie-atlas-map-v1.png" | relURL }}" width="1672" height="941" alt="등대, 성채, 항구, 나침반, 바다 표지가 있는 Kedzie Dev Atlas의 항해도" />
       <figcaption class="sr-only" id="atlas-map-title">Atlas Landmark Map</figcaption>
-      <p class="sr-only" id="atlas-map-desc">GitOps 등대, Kubernetes 성채, GitLab Runner와 Jenkins 작업장, Docker 항구, Grafana 관측 해역과 오른쪽 Argo CD 해역을 포함한 전체 운영 지도입니다. 아래 landmark 목록으로도 모든 영역을 탐색할 수 있습니다.</p>
+      <p class="sr-only" id="atlas-map-desc">GitOps 등대, Kubernetes 성채, GitLab Runner와 Jenkins 작업장, Docker 항구, Grafana 관측 해역과 오른쪽 Argo CD 해역을 포함한 전체 운영 지도입니다. 오른쪽 아래 범례는 인장이 운영 영역, 점선 항로가 배포와 운영의 흐름을 뜻함을 설명합니다. 아래 landmark 목록으로도 모든 영역을 탐색할 수 있습니다.</p>
+      <aside class="atlas-map-legend" aria-label="지도 범례">
+        <p><span class="atlas-map-legend-seal" aria-hidden="true">◎</span>인장 · 운영 영역</p>
+        <p><span class="atlas-map-legend-route" aria-hidden="true"></span>점선 항로 · 배포·운영 흐름</p>
+      </aside>
       {{ range $landmark := $landmarks }}
         <button
           class="map-hotspot map-hotspot--{{ .id }}{{ with .icon }} has-logo{{ end }}"

@@ -261,6 +261,36 @@ button { color: inherit; }
   object-fit: cover;
   object-position: center;
 }
+.atlas-map-legend {
+  position: absolute;
+  z-index: 1;
+  right: 3.2%;
+  bottom: 6.2%;
+  width: 13.8%;
+  margin: 0;
+  padding: 1.2% 1.4%;
+  color: color-mix(in srgb, var(--ink) 78%, var(--blue));
+  font: 700 0.65rem/1.35 var(--font-mono);
+  letter-spacing: 0;
+  pointer-events: none;
+}
+.atlas-map-legend p {
+  display: flex;
+  align-items: center;
+  gap: 0.32rem;
+  margin: 0;
+  white-space: nowrap;
+}
+.atlas-map-legend p + p { margin-top: 0.34rem; }
+.atlas-map-legend-seal {
+  color: var(--blue);
+  font: 900 1.05rem/1 var(--font-display);
+}
+.atlas-map-legend-route {
+  display: inline-block;
+  width: 1.55rem;
+  border-top: 2px dotted var(--blue);
+}
 .map-hotspot {
   position: absolute;
   z-index: 1;
@@ -1024,6 +1054,7 @@ button { color: inherit; }
   .atlas-intro-action > p { max-width: none; }
   .atlas-stage { aspect-ratio: 1672 / 941; }
   .atlas-map img { object-fit: contain; }
+  .atlas-map-legend { display: none; }
   .map-hotspot { width: 2rem; height: 2rem; }
   .map-hotspot.has-logo { width: 3.15rem; height: 3.15rem; }
   .map-hotspot:not(.has-logo) { display: none; }
